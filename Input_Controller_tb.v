@@ -1,30 +1,31 @@
+`timescale 100ps/10ps
+
 module Input_Controller_tb;
 
-    reg clk, // 40Mhz clock
-    //input reset,
-    //reg button_data,
-    wire latch,
-    wire pulse,
-    wire slow_clk;
+    reg clk; // 40Mhz clock
+    //input reset;
+    //reg button_data;
+    wire pulse;
+    wire slow_clk_tb;
+    wire latch_tb;
+    //wire [18:0] slow_clk_counter_tb;
 
     Input_Controller uut (
         .clk(clk),                
         //.button_data(button_data),
-        .latch(latch),
+        .latch_tb(latch_tb),
         .pulse(pulse),
-        .slow_clk(slow_clk)
+        .slow_clk_tb(slow_clk_tb)
+        //.slow_clk_counter_tb(slow_clk_counter_tb)
     );
 
     initial begin
-
-        clk = 0;
-        #100
-
+        clk = 1'b0;
     end
 
     always @(*)
     begin
-        #1 clk <= ~clk;
+        #125 clk <= ~clk;
     end
 
 endmodule
