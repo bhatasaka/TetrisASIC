@@ -1,9 +1,7 @@
-// Quartus Prime Verilog Template
-// True Dual Port RAM with single clock
 module vga_mem
 #(parameter DATA_WIDTH=8, parameter ADDR_WIDTH=16)
 (
-	input [(DATA_WIDTH-1):0] data_a, data_b,
+	input [(DATA_WIDTH-1):0] data_a,
 	input [(ADDR_WIDTH-1):0] addr_a, addr_b,
 	input we_a, clk,
 	output reg [(DATA_WIDTH-1):0] q_a, q_b
@@ -35,7 +33,10 @@ module vga_mem
 	// Port B 
 	always @ (posedge clk)
 	begin
-		q_b <= ram[addr_b];
+		if(addr_b == addr_a && we_a)
+			q_b <= data_a;
+		else
+			q_b <= ram[addr_b];
 	end
 
 endmodule
