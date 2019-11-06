@@ -12,8 +12,8 @@ module vga_mem
 	integer i;
 	
 	initial begin
-	for(i = 0; i < 1024; i = i+1)	//Just initialize all with index.
-		ram[i] = i[15:0];
+	for(i = 0; i < 65536; i = i+1)	//Just initialize all with index.
+		ram[i] = i[7:0];
 	end
 
 	// Port A 
