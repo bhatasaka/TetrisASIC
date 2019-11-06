@@ -1,4 +1,4 @@
-module vga_mem
+module VGA_Mem
 #(parameter DATA_WIDTH=8, parameter ADDR_WIDTH=16)
 (
 	input [(DATA_WIDTH-1):0] data_a,

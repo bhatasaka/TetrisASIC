@@ -1,4 +1,4 @@
-module grid_mem
+module Grid_Mem
 #(parameter DATA_WIDTH=8, parameter ADDR_WIDTH=8)
 (
 	input [(DATA_WIDTH-1):0] data_a,
