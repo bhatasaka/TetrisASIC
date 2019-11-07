@@ -1,4 +1,4 @@
-module vga_mem
+module VGA_Mem
 #(parameter DATA_WIDTH=8, parameter ADDR_WIDTH=16)
 (
 	input [(DATA_WIDTH-1):0] data_a,
@@ -12,8 +12,8 @@ module vga_mem
 	integer i;
 	
 	initial begin
-	for(i = 0; i < 1024; i = i+1)	//Just initialize all with index.
-		ram[i] = i[15:0];
+	for(i = 0; i < 65536; i = i+1)	//Just initialize all with index.
+		ram[i] = i[7:0];
 	end
 
 	// Port A 

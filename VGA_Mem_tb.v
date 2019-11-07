@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module tb_grid_mem;
+module VGA_Mem_tb;
 	reg [15:0] addr_a;
 	reg [15:0] addr_b;
 
@@ -15,7 +15,7 @@ module tb_grid_mem;
 	parameter FULL_CLK = 24;
 	parameter HALF_CLK = 12;
 	
-	vga_mem grid_mem_test (
+	VGA_Mem grid_mem_test (
 		.data_a(data_a),
 		.addr_a(addr_a),
 		.addr_b(addr_b),
