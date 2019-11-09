@@ -12,8 +12,8 @@ module VGA_Mem_tb;
 	wire [7:0] out_a;
 	wire [7:0] out_b;
 
-	parameter FULL_CLK = 24;
-	parameter HALF_CLK = 12;
+	parameter FULL_CLK = 20;
+	parameter HALF_CLK = 10;
 	
 	VGA_Mem grid_mem_test (
 		.data_a(data_a),
@@ -30,8 +30,8 @@ module VGA_Mem_tb;
 	initial begin
 	
 		data_a = 8'b0;
-		addr_a = 8'b0;
-		addr_b = 8'b0;
+		addr_a = 16'b0;
+		addr_b = 16'b0;
 		we_a = 1'b0;
 		clock = 1'b0;
 	
@@ -40,21 +40,21 @@ module VGA_Mem_tb;
 	//1 - Write to A.
 	$display("Writing only to A: ");
 	data_a = 8'd200;
-	addr_a = 8'b0000_0000;
+	addr_a = 16'b0;
 	we_a = 1'b1;
 	#FULL_CLK
 	we_a = 1'b0;
 	$display(out_a); //Should display 200.
 	
 	$display("Reading from B: ");
-	addr_b = 8'b0;
+	addr_b = 16'b0;
 	#FULL_CLK
 	$display(out_b); //Should display 200
 	
 	//2 - Read from both
 	$display("Read different addresses from both: ");
-	addr_a = 8'd23;
-	addr_b = 8'd24;
+	addr_a = 16'd23;
+	addr_b = 16'd24;
 	data_a = 8'd37;
 	
 	#FULL_CLK
@@ -63,8 +63,8 @@ module VGA_Mem_tb;
 
 	//3 - Write to A and read from both
 	$display("Writing to A and reading the same addr from A and B: ");
-	addr_a = 8'b0000_0001;
-	addr_b = 8'b0000_0001;
+	addr_a = 16'b0000_0001;
+	addr_b = 16'b0000_0001;
 	data_a = 8'd37;
 	we_a = 1'b1;
 	
@@ -77,8 +77,8 @@ module VGA_Mem_tb;
 	$display("Writing and reading every number up to 12-bits: ");
     for (i = 0; i < 2096; i = i+1)
     begin
-		addr_a = i[7:0];
-		addr_b = i[7:0];
+		addr_a = i[15:0];
+		addr_b = i[15:0];
 		data_a = i[7:0];
 		we_a = 1'b1;
 		#FULL_CLK
