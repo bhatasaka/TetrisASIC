@@ -12,8 +12,8 @@ module Grid_Mem_tb;
 	wire [7:0] out_a;
 	wire [7:0] out_b;
 
-	parameter FULL_CLK = 24;
-	parameter HALF_CLK = 12;
+	parameter FULL_CLK = 20;
+	parameter HALF_CLK = 10;
 	
 	Grid_Mem grid_mem_test (
 		.data_a(data_a),
