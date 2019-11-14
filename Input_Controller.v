@@ -32,10 +32,11 @@ module Input_Controller (
         slow_clk_counter <= slow_clk_counter + 19'd1;
         
         case (slow_clk_counter)
-            19'd600: begin
+            19'd600: // //negedge of latch
+            begin
                 latch <= 1'b0;
             end
-            19'd900: 
+            19'd900: //posedge of pulse1
             begin
                 if (button_data_in == 1'b0 && button_lock == 1'b0) // A button pressed = 1
                 begin
@@ -47,7 +48,7 @@ module Input_Controller (
                     pulse <= 1'b1;
                 end
             end
-            19'd1500:
+            19'd1500: // posedge pulse2
             begin
                 if (button_data_in == 1'b0 && button_lock == 1'b0) // B button pressed = 2
                 begin
@@ -59,7 +60,7 @@ module Input_Controller (
                     pulse <= 1'b1;
                 end
             end
-            19'd2100:
+            19'd2100: //posedge pulse3
             begin
                 if (button_data_in == 1'b0 && button_lock == 1'b0) // Select button pressed = 3
                 begin
@@ -71,7 +72,7 @@ module Input_Controller (
                     pulse <= 1'b1;
                 end
             end
-            19'd2700:
+            19'd2700: //posedge pulse4
             begin
                 if (button_data_in == 1'b0 && button_lock == 1'b0) // Start button pressed = 4
                 begin
@@ -83,7 +84,7 @@ module Input_Controller (
                     pulse <= 1'b1;
                 end
             end
-            19'd3300:
+            19'd3300: //posedge pulse5
             begin
                 if (button_data_in == 1'b0 && button_lock == 1'b0) // Up button pressed = 5
                 begin
@@ -95,7 +96,7 @@ module Input_Controller (
                     pulse <= 1'b1;
                 end
             end
-            19'd3900:
+            19'd3900: //posedge pulse6
             begin
                 if (button_data_in == 1'b0 && button_lock == 1'b0) // Down button pressed = 6
                 begin
@@ -107,7 +108,7 @@ module Input_Controller (
                     pulse <= 1'b1;
                 end
             end
-            19'd4500:
+            19'd4500: //posedge pulse7
             begin
                 if (button_data_in == 1'b0 && button_lock == 1'b0) // Left button pressed = 7
                 begin
@@ -119,7 +120,7 @@ module Input_Controller (
                     pulse <= 1'b1;
                 end
             end
-            19'd5100:
+            19'd5100: //posedge pulse8
             begin
                 if (button_data_in == 1'b0 && button_lock == 1'b0) // Right button pressed = 8
                 begin
@@ -131,13 +132,13 @@ module Input_Controller (
                     pulse <= 1'b1;
                 end
             end
-            19'd1200, 19'd1800, 19'd2400, 19'd3000, 19'd3600, 19'd4200, 19'd4800, 19'd5400: 
+            19'd1200, 19'd1800, 19'd2400, 19'd3000, 19'd3600, 19'd4200, 19'd4800, 19'd5400: //negedge of pusles 
             begin
                 pulse <= 1'b0;
             end
             19'd416667: // 60 Hz clock
             begin
-                if (slow_clk == 1'b0) 
+                if (slow_clk == 1'b0) // if on rising edge of slow clock send latch signal
                 begin
                     latch <= 1'b1;
                 end

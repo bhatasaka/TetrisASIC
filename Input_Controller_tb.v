@@ -1,4 +1,4 @@
-`timescale 100ps/100ps
+`timescale 10ns/1ns
 
 module Input_Controller_tb;
 
@@ -28,47 +28,58 @@ module Input_Controller_tb;
     initial begin
         clk = 1'b0;
         button_data_in = 1'b1;
+        // #1000000
+        // button_data_in = 1'b0;
+        // #500000
+        // button_data_in = 1'b1;
+
+        // To send a button for only one slow clock cycle, use # and do it for the
+        // exact amount of time needed. Method below acts as if holding down a button
     end
 
-    always @(posedge latch_tb)
-    begin
-        button_data_in = 1'b1; // send A button
-    end
-    always @(negedge slow_clk_tb)
+    always @(negedge slow_clk_tb) //keep button data high (no button pressed)
     begin
         button_data_in = 1'b1;
     end
+
+    // *** Set button_data_in <= 1'b0 for button you want to send ***
+
+    always @(posedge latch_tb)
+    begin
+        button_data_in = 1'b1; // send A button (1)
+    end
+
     always @(posedge pulse_tb)
     begin
         pulse_counter <= pulse_counter + 1'b1;
-        case (pulse_counter)
+        case (pulse_counter)  
             4'd0: 
             begin
-                //button_data_in <= 1'b0; //send B button
+                button_data_in <= 1'b1; //send B button (2)
             end
             4'd1: 
             begin
-                //button_data_in <= 1'b0; //send Select button
+                button_data_in <= 1'b1; //send Select button (3)
             end
             4'd2: 
             begin
-                //button_data_in <= 1'b0; //send Start button
+                button_data_in <= 1'b1; //send Start button (4)
             end
             4'd3: 
             begin
-                //button_data_in <= 1'b0; //send Up button
+                button_data_in <= 1'b1; //send Up button (5)
             end
             4'd4: 
             begin
-                //button_data_in <= 1'b0; //send Down button
+                button_data_in <= 1'b1; //send Down button (6)
             end
             4'd5: 
             begin
-                //button_data_in <= 1'b0; //send Left button
+                button_data_in <= 1'b1; //send Left button (7)
             end
             4'd6: 
             begin
-                //button_data_in <= 1'b0; //send Right button
+                button_data_in <= 1'b1; //send Right button (8)
             end
             4'd7: 
             begin
@@ -77,16 +88,16 @@ module Input_Controller_tb;
             end 
             4'd8: 
             begin
-
+                button_data_in <= 1'b1;
             end
         endcase
-        button_data_in <= 1'b1;
+        
     end
 
 
     always @(*)
     begin
-        #100 clk <= ~clk;
+        #1 clk <= ~clk;
     end
 
 endmodule
