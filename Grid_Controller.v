@@ -3,21 +3,8 @@ module Grid_Controller (
 		input clock,
 		input reset,
 		input [3:0] controllerIn,
-        input [3:0] tetrisGridIn,
-        output reg [3:0] tetrisGridOut,
-
-		output reg Mux_Imm_Cntrl,
-		output reg Mux_PC_Cntrl,
-		output reg Mux_LD_Cntrl,
-		output reg Mux_J_Cntrl,
-		output reg Mux_RegEn_Cntrl,
-		output reg Mux_Switches_Cntrl,
-		output reg Flag_En,
-		output reg PC_En,
-		output reg regOn,	
-		output reg [1:0] WR_En,
-		output [3:0] fsmState,
-		output reg [15:0] i
+        input [7:0] tetrisGridIn,
+        output reg [7:0] tetrisGridOut,
 );
 	
 	parameter [3:0] s0 = 4'b0000, s1 = 4'b0001, s2 = 4'b0010, s3 = 4'b0011, s4 = 4'b0100, 
@@ -99,205 +86,54 @@ module Grid_Controller (
 		case(state)
 		
 			SpecialState: begin
-					Mux_Imm_Cntrl = 1'b0; 
-					Mux_PC_Cntrl = 1'b0;
-					Mux_LD_Cntrl = 1'b0;
-					Mux_J_Cntrl = 1'b0;
-					Flag_En = 1'b0;
-					//PC_En = 1'b0;
-					PC_En = 1'b1;
-					WR_En = 2'b10; /// maybe next step?
-					regOn = 1'b0;
-					Mux_RegEn_Cntrl = 1'b0;
-					Mux_Switches_Cntrl = 1'b0;
+
 					end
 			s0: begin // reset state
-					Mux_Imm_Cntrl = 1'b0;
-					Mux_PC_Cntrl = 1'b0;
-					Mux_LD_Cntrl = 1'b0;
-					Mux_J_Cntrl = 1'b0;
-					Flag_En = 1'b0;
-					PC_En = 1'b0;
-					WR_En = 2'b00;
-					regOn = 1'b0;
-					Mux_RegEn_Cntrl = 1'b0;
-					Mux_Switches_Cntrl = 1'b1;
+
 					end
-			s1: begin // initial state
-					Mux_Imm_Cntrl = 1'b0;
-					Mux_PC_Cntrl = 1'b1;
-					Mux_LD_Cntrl = 1'b0;
-					Mux_J_Cntrl = 1'b0;
-					Flag_En = 1'b0;
-					PC_En = 1'b0; // should this be 1?
-					WR_En = 2'b00;
-					regOn = 1'b0;
-					Mux_RegEn_Cntrl = 1'b0;
-					Mux_Switches_Cntrl = 1'b1;
+			s1: begin // start/setup state
+
 
 				 end
-			s2: begin // Rtype non immediate
-					Mux_Imm_Cntrl = 1'b0;
-					Mux_PC_Cntrl = 1'b1;
-					Mux_LD_Cntrl = 1'b0;
-					Mux_J_Cntrl = 1'b0;
-					Flag_En = 1'b1;
-					PC_En = 1'b1;
-					WR_En = 2'b00;
-					regOn = 1'b1;
-					Mux_RegEn_Cntrl = 1'b0;
-					Mux_Switches_Cntrl = 1'b1;
-				 end	
-			s10: begin // Rtype immediate
-					Mux_Imm_Cntrl = 1'b1;
-					Mux_PC_Cntrl = 1'b1;
-					Mux_LD_Cntrl = 1'b0;
-					Mux_J_Cntrl = 1'b0;
-					Flag_En = 1'b1;
-					PC_En = 1'b1;
-					//PC_En = 1'b0;
-					WR_En = 2'b00;
-					regOn = 1'b1;
-					Mux_RegEn_Cntrl = 1'b0;
-					Mux_Switches_Cntrl = 1'b1;
-				 end	
-			s11: begin // Rtype immediate
-					Mux_Imm_Cntrl = 1'b0;
-					Mux_PC_Cntrl = 1'b1;
-					Mux_LD_Cntrl = 1'b0;
-					Mux_J_Cntrl = 1'b0;
-					Flag_En = 1'b0;
-					//PC_En = 1'b1;
-					PC_En = 1'b0;
-					WR_En = 2'b00;
-					regOn = 1'b0;
-					Mux_RegEn_Cntrl = 1'b0;
-					Mux_Switches_Cntrl = 1'b1;
-				 end		 	 
-			s3: begin //Load
-					Mux_Imm_Cntrl = 1'b0; //don't care
-					Mux_PC_Cntrl = 1'b0;
-					Mux_LD_Cntrl = 1'b1;
-					Mux_J_Cntrl = 1'b0;
-					Flag_En = 1'b0;
-					//PC_En = 1'b0;
-					PC_En = 1'b1;
-					WR_En = 2'b00;
-					regOn = 1'b0;
-					Mux_RegEn_Cntrl = 1'b0;
-					Mux_Switches_Cntrl = 1'b1;
-				 end		
-			s4: begin // Load
-					Mux_Imm_Cntrl = 1'b0; //don't care
-					Mux_PC_Cntrl = 1'b1;
-					Mux_LD_Cntrl = 1'b1;
-					Mux_J_Cntrl = 1'b0;
-					Flag_En = 1'b0;
-					PC_En = 1'b0;
-					//PC_En = 1'b1;
-					WR_En = 2'b00;
-					regOn = 1'b1;
-					Mux_RegEn_Cntrl = 1'b1;
-					Mux_Switches_Cntrl = 1'b1;
-				 end	
-			s5: begin // store 
-					Mux_Imm_Cntrl = 1'b0; 
-					Mux_PC_Cntrl = 1'b0;
-					Mux_LD_Cntrl = 1'b0;
-					Mux_J_Cntrl = 1'b0;
-					Flag_En = 1'b0;
-					//PC_En = 1'b0;
-					PC_En = 1'b1;
-					WR_En = 2'b10; /// maybe next step?
-					regOn = 1'b0;
-					Mux_RegEn_Cntrl = 1'b0;
-					Mux_Switches_Cntrl = 1'b1;
-				 end	
-			s6: begin //store
-					Mux_Imm_Cntrl = 1'b0; 
-					Mux_PC_Cntrl = 1'b1;
-					Mux_LD_Cntrl = 1'b0;
-					Mux_J_Cntrl = 1'b0;
-					Flag_En = 1'b0;
-					//PC_En = 1'b1;
-					PC_En = 1'b0;
-					WR_En = 2'b00;
-					regOn = 1'b0;
-					Mux_RegEn_Cntrl = 1'b0;
-					Mux_Switches_Cntrl = 1'b1;
-				 end	
+			s2: begin // move block down
+
+				 end
+			s3: begin // move block right
+
+				 end
+			s4: begin // move block left
+
+				 end
+			s5: begin // rotate block clockwise
+
+				 end
+			s6: begin // check for full row
+
+				 end
+			s7: begin // clear row(s)
+
+				 end
+			s8: begin // check for game over
+
+				 end
 	
-			s7: begin //jump
-					Mux_Imm_Cntrl = 1'b0; //don't care
-					Mux_PC_Cntrl = 1'b1;
-					Mux_LD_Cntrl = 1'b0;
-					Mux_J_Cntrl = 1'b1;
-					Flag_En = 1'b0;
-					PC_En = 1'b1; 
-					WR_En = 2'b00;
-					regOn = 1'b0;
-					Mux_RegEn_Cntrl = 1'b0;
-					Mux_Switches_Cntrl = 1'b1;
-				 end	
-			s8: begin //jump
-					Mux_Imm_Cntrl = 1'b0; //don't care
-					Mux_PC_Cntrl = 1'b1;
-					Mux_LD_Cntrl = 1'b0;
-					Mux_J_Cntrl = 1'b0; 
-					Flag_En = 1'b0;
-					PC_En = 1'b0;
-					WR_En = 2'b00;
-					regOn = 1'b0;
-					Mux_RegEn_Cntrl = 1'b0;
-					Mux_Switches_Cntrl = 1'b1;
-				 end	
-			s12: begin //jal - store pc in r15
-					Mux_Imm_Cntrl = 1'b0; 
-					Mux_PC_Cntrl = 1'b1;
-					Mux_LD_Cntrl = 1'b0;
-					Mux_J_Cntrl = 1'b1;
-					Flag_En = 1'b0;
-					PC_En = 1'b1; 
-					WR_En = 2'b00;
-					regOn = 1'b1;
-					Mux_RegEn_Cntrl = 1'b0;
-					Mux_Switches_Cntrl = 1'b1;
-				 end	
-			s13: begin //jal
-					Mux_Imm_Cntrl = 1'b0;
-					Mux_PC_Cntrl = 1'b1; 
-					Mux_LD_Cntrl = 1'b0; 
-					Mux_J_Cntrl = 1'b0;
-					Flag_En = 1'b0;
-					PC_En = 1'b0;
-					WR_En = 2'b00;
-					regOn = 1'b0;
-					Mux_RegEn_Cntrl = 1'b0;
-					Mux_Switches_Cntrl = 1'b1;
-				 end	
-			s9: begin //stop
-					Mux_Imm_Cntrl = 1'b0; //don't care
-					Mux_PC_Cntrl = 1'b1;
-					Mux_LD_Cntrl = 1'b0;
-					Mux_J_Cntrl = 1'b0;
-					Flag_En = 1'b0;
-					PC_En = 1'b0;
-					WR_En = 2'b00;
-					regOn = 1'b0;
-					Mux_RegEn_Cntrl = 1'b0;
-					Mux_Switches_Cntrl = 1'b1;
+			s9: begin // generate new block
+
+				 end
+			s10: begin 
+
+				 end
+			s11: begin
+
+				 end
+			s12: begin
+
+				 end
+			s13: begin 
+
 				 end	
 			default: begin 
-					Mux_Imm_Cntrl = 1'b0; //don't care
-					Mux_PC_Cntrl = 1'b0;
-					Mux_LD_Cntrl = 1'b0;
-					Mux_J_Cntrl = 1'b0;
-					Flag_En = 1'b0;
-					PC_En = 1'b0;
-					WR_En = 2'b00;
-					regOn = 1'b0;
-					Mux_RegEn_Cntrl = 1'b0;
-					Mux_Switches_Cntrl = 1'b1;
+
 				 end
 		endcase
 	 end
