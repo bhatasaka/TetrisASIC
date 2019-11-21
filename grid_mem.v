@@ -12,8 +12,8 @@ module Grid_Mem
 	integer i;
 	
 	initial begin
-	for(i = 0; i < 255; i = i+1)	//Just initialize all with index.
-		ram[i] = i[7:0];
+	for(i = 0; i < 255; i = i+1)	//Just initialize all with zeros
+		ram[i] = 8'b0;
 	end
 
 	// Port A 
