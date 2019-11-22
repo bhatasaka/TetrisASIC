@@ -1,0 +1,9 @@
+773 // white
+700 // green
+070 // red
+003 // blue
+740 // orange
+770 // yellow
+703 // purple
+073 // sky blue
+000 // black
