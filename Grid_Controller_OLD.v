@@ -4,7 +4,7 @@ module Grid_Controller (
 		input reset,
 		input [3:0] controllerIn,
         input [7:0] tetrisGridIn,
-        output reg [7:0] tetrisGridOut,
+        output reg [7:0] tetrisGridOut
 );
 	
 	parameter [3:0] s0 = 4'b0000, s1 = 4'b0001, s2 = 4'b0010, s3 = 4'b0011, s4 = 4'b0100, 
