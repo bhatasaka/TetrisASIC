@@ -151,6 +151,6 @@ module Input_Controller (
     
     always@(posedge slow_clk)
     begin
-        button_data_out <= 1'd0;
+        button_data_out <= 1'd0; // move this to when latch<=1'b1 right above and add reset functionality
     end
 endmodule
