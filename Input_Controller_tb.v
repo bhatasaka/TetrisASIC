@@ -59,7 +59,7 @@ module Input_Controller_tb;
             end
             4'd1: 
             begin
-                button_data_in <= 1'b1; //send Select button (3)
+                button_data_in <= 1'b0; //send Select button (3)
             end
             4'd2: 
             begin
