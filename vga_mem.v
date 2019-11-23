@@ -14,7 +14,9 @@ module VGA_Mem
 	initial begin
 	for(i = 0; i < 65536; i = i+1)	//Just initialize all with zeros
 		ram[i] = 8'b0;
+	$readmemb("/home/hatasaka/TetrisASIC/VGA_data.txt", ram);
 	end
+
 
 	// Port A 
 	always @ (posedge clk)
