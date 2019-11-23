@@ -3,6 +3,7 @@ module Input_Controller (
     input clk, // 50Mhz clock
     //input reset,
     input button_data_in,
+    output nes_reset,
     output latch_tb,
     output slow_clk_tb,
     output pulse_tb,
@@ -16,6 +17,7 @@ module Input_Controller (
     reg [18:0] latch_clk_counter = 19'd0;
     reg [18:0] pulse_clk_counter = 19'd0;
     reg button_lock = 1'b1;
+    reg nes_reset = 1'b0;
 
     reg slow_clk = 1'b0;
     reg latch = 1'b0;
@@ -78,6 +80,7 @@ module Input_Controller (
                 begin
                     button_data_out <= 4'b0100;
                     button_lock <= 1'b1;
+                    nes_reset <= 1'b1;
                 end
                 if (slow_clk == 1'b1) 
                 begin
@@ -151,6 +154,6 @@ module Input_Controller (
     
     always@(posedge slow_clk)
     begin
-        button_data_out <= 1'd0;
+        button_data_out <= 1'd0; // move this to when latch<=1'b1 right above and add reset functionality
     end
 endmodule
