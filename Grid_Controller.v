@@ -1,3 +1,12 @@
+// ============================
+// This module is the FSM for Tetris. It receives button data
+// from the input controller, determines the action that needs to 
+// take place, then updates the tetris grid data.
+// 
+// Author: Jamison Bauer
+// 
+// ============================
+
 module Grid_Controller (
 		
 		input clk,

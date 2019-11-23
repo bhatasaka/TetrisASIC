@@ -1,3 +1,14 @@
+// ============================
+// This module implements the NES controller communication protocol.
+// At a frequency of 60 Hz, a latch signal is set high for 12us, 
+// followed by a 6us delay, followed by 8 12us 50% duty cycle pulses.
+// The button data is received from the NES controller and sent to the
+// Grid_Controller module to perform the appropriate actions.
+// 
+// Author: Jamison Bauer
+// 
+// ============================
+
 module Input_Controller (
 
     input clk, // 50Mhz clock
