@@ -13,6 +13,8 @@ module Grid_To_Video_tb;
 	parameter FULL_CLK = 20;
 	parameter HALF_CLK = 10;
 	
+	integer i = 0;
+
 	VGA_Mem vga_mem_test (
 		.data_a(8'b0),
 		.addr_a(vga_addr_a),
@@ -72,13 +74,14 @@ module Grid_To_Video_tb;
 		#FULL_CLK;
 		grid_we = 1'b0;
 		px_en = 1'b1;
-		#3540; // Wait 177 clock cycles
-		#FULL_CLK;
-		#FULL_CLK;
-		#FULL_CLK;
-		#FULL_CLK;
-		#FULL_CLK;
 
+		for(i = 0; i < 25; i = i + 1)
+		begin
+			#25400; // Wait 25.4 microseconds
+			px_en = 1'b0;
+			#300; // Wait 300ns
+			px_en = 1'b1;
+		end
 
 	    $display("Done.");
 	end

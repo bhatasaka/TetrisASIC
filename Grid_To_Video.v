@@ -16,7 +16,6 @@ module Grid_To_Video (
     output reg [7:0] pixel_rgb,
     output reg [15:0] vga_addr
 );
-    reg px_addr_state;
 
     reg px_clk;
     reg[4:0] col_offset_counter, row_offset_counter, grid_col, grid_row;
@@ -66,7 +65,7 @@ module Grid_To_Video (
         endcase
     end
 
-    always @ (px_clk)
+    always @ (posedge px_clk)
     begin
         if(reset)
         begin
@@ -74,9 +73,8 @@ module Grid_To_Video (
             row_offset_counter <= 5'b0;
             current_column <= 10'b0;
             current_row <= 10'b0;
-            px_addr_state <= 1'b0;
-            grid_col <= 1'b0;
-            grid_row <= 1'b0;
+            grid_col <= 5'b0;
+            grid_row <= 5'b0;
         end
         else if(px_en)
         begin
@@ -89,9 +87,8 @@ module Grid_To_Video (
                 begin
                     col_offset_counter <= 0;
                     // If we have counted 24 pixels, we must increment the grid column
-                    if(grid_col == 5'd11)
-                        grid_col <= 5'b0;
-                    else
+                    // only if we are less than 11 (block 12) this will get reset at a different point
+                    if(grid_col < 5'd11)
                         grid_col <= grid_col + 5'd1;
 
                 end
@@ -106,40 +103,57 @@ module Grid_To_Video (
             if(current_column == 10'd639)
             begin
                 current_column <= 10'b0;
-
-                // If we are resetting the column count, then we are incrementing the row
-                if(current_row == 10'd479)
-                begin
-                    current_row <= 10'b0;
-                    row_offset_counter <= 5'b0;
-                end
-                else
-                begin
-                    current_row <= current_row + 1;
-
-                    if(row_offset_counter == 5'd23)
-                    begin
-                        row_offset_counter <= 5'b0;
-
-                        // If we have moved 24 pixels down, we need to increment the grid row
-                        if(grid_row == 5'd19)
-                            grid_row <= 5'b0;
-                        else
-                            grid_row <= grid_row + 5'd1;
-                    end
-                    else
-                        row_offset_counter <= row_offset_counter + 5'b1;
-                end
             end
             else
             begin
-                current_column <= current_column + 1;
+                current_column <= current_column + 10'b1;
             end
-
         end
+        else if(px_en == 1'b0)
+        begin
+            // If px_en isn't high, then we will just reset the current column to 0
+            current_column <= 10'b0;
+            grid_col <= 5'b0;
+            col_offset_counter <= 5'b0;
+        end
+    end
 
-        
-        px_addr_state <= ~px_addr_state;
+    always @ (negedge px_en, reset)
+    begin
+        if(reset)
+        begin
+            current_row <= 10'b0;
+            row_offset_counter <= 5'b0;
+            grid_row <=5'b0;
+        end
+        else
+        begin
+            // On the negative edge of the px_en, the row can be incremented
+            if(current_row == 10'd479) // Reset back to screen 0,0
+            begin
+                current_row <= 10'b0;
+                row_offset_counter <= 5'b0;
+                grid_row <= 5'b0;
+            end
+            else
+            begin
+                current_row <= current_row + 10'b1;
+
+                if(row_offset_counter == 5'd23)
+                begin
+                    row_offset_counter <= 5'b0;
+
+                    // If we have moved 24 pixels down, we need to increment the grid row
+                    // Only if we are less than 19, otherwise, stay at 19 (block 20)
+                    if(grid_row < 5'd19)
+                        grid_row <= grid_row + 5'd1;
+                end
+                else
+                begin
+                    row_offset_counter <= row_offset_counter + 5'b1;
+                end
+            end
+        end
     end
 
 
