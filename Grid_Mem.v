@@ -3,7 +3,7 @@ module Grid_Mem
 (
 	input [(DATA_WIDTH-1):0] data_a,
 	input [(ADDR_WIDTH-1):0] addr_a, addr_b,
-	input we_a, clk,
+	input we_a, clk, reset,
 	output reg [(DATA_WIDTH-1):0] q_a, q_b
 );
 
@@ -12,31 +12,42 @@ module Grid_Mem
 	integer i;
 	
 	initial begin
-	for(i = 0; i < 255; i = i+1)	//Just initialize all with zeros
+	for(i = 0; i < 256; i = i+1)	//Just initialize all with zeros
 		ram[i] = 8'b0;
 	end
 
 	// Port A 
 	always @ (posedge clk)
 	begin
-		if (we_a) 
+		if(reset)
 		begin
-			ram[addr_a] <= data_a;
-			q_a <= data_a;
+			for(i = 0; i < 256; i = i+1)	//Just initialize all with zeros
+				ram[i] <= 8'b0;
 		end
-		else 
+		else
 		begin
-			q_a <= ram[addr_a];
+			if (we_a) 
+			begin
+				ram[addr_a] <= data_a;
+				q_a <= data_a;
+			end
+			else 
+			begin
+				q_a <= ram[addr_a];
+			end
 		end
 	end
 
 	// Port B 
 	always @ (posedge clk)
 	begin
-		if(addr_b == addr_a && we_a)
-			q_b <= data_a;
-		else
-			q_b <= ram[addr_b];
+		if(reset == 1'b0)
+		begin
+			if(addr_b == addr_a && we_a)
+				q_b <= data_a;
+			else
+				q_b <= ram[addr_b];
+		end
 	end
 
 endmodule

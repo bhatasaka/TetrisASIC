@@ -7,7 +7,7 @@ module Grid_Mem_tb;
 	reg [7:0] data_a;
 	reg we_a;
 	
-	reg clock;
+	reg clock, reset;
 	
 	wire [7:0] out_a;
 	wire [7:0] out_b;
@@ -20,6 +20,7 @@ module Grid_Mem_tb;
 		.addr_a(addr_a),
 		.addr_b(addr_b),
 		.we_a(we_a),
+		.reset(reset),
 		.clk(clock),
 		.q_a(out_a),
 		.q_b(out_b)
@@ -34,6 +35,7 @@ module Grid_Mem_tb;
 		addr_b = 8'b0;
 		we_a = 1'b0;
 		clock = 1'b0;
+		reset = 1'b0;
 	
 	#FULL_CLK
 
@@ -88,6 +90,22 @@ module Grid_Mem_tb;
 		if(out_b != i[7:0])
 			$display("Read from b EXPECTED: %d\tACTUAL: %d", i[7:0], out_b);
 		#FULL_CLK;
+	end
+
+	#FULL_CLK;
+	reset = 1'b1;
+	#FULL_CLK;
+	reset = 1'b0;
+	#FULL_CLK;
+
+	$display("Reset and read all values:");
+
+	for (i = 0; i < 256; i = i+1)
+    begin
+		addr_a = i[7:0];
+		#FULL_CLK
+		if(out_a != 0)
+			$display("Read from a at address: %d\nEXPECTED: %d\tACTUAL: %d", i[7:0], 0, out_a);
 	end
 	
 	$display("Done.");
