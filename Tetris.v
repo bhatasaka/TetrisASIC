@@ -39,7 +39,7 @@ module Tetris (
         .controller_in(button_data),
         .tetris_grid_in(data_from_grid),
         .grid_address(grid_address),
-        .tetris_grid_out(data_to_grid),
+        .grid_data_out(data_to_grid),
         .write_en(grid_we)
     );
 
