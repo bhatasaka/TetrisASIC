@@ -36,8 +36,8 @@ module Input_Controller (
     // assign latch_tb = latch;
     // assign pulse_tb = pulse;
     // assign button_data_out_tb = button_data_out;
-    parameter [3:0] a_button = 4'b0001, b_button = 4'b0010, select_button = 4'b0011, start_button = 4'b0100,
-                    up_button = 4'b0101, down_button = 4'b0110, left_button = 4'b0111, right_button = 4'b1000;
+    parameter [3:0] A_BUTTON = 4'b0001, B_BUTTON = 4'b0010, SELECT_BUTTON = 4'b0011, START_BUTTON = 4'b0100,
+                    UP_BUTTON = 4'b0101, DOWN_BUTTON = 4'b0110, LEFT_BUTTON = 4'b0111, RIGHT_BUTTON = 4'b1000;
     
     always@(posedge clk) // posedge every 20 ns
     begin
@@ -62,7 +62,7 @@ module Input_Controller (
             begin
                 if (~button_data_in && ~button_lock) // A button pressed = 1
                 begin
-                    button_data_out <= a_button;
+                    button_data_out <= A_BUTTON;
                     button_lock <= 1'b1;
                 end
                 if (slow_clk == 1'b1) 
@@ -74,7 +74,7 @@ module Input_Controller (
             begin
                 if (~button_data_in && ~button_lock) // B button pressed = 2
                 begin
-                    button_data_out <= b_button;
+                    button_data_out <= B_BUTTON;
                     button_lock <= 1'b1;
                 end
                 if (slow_clk == 1'b1) 
@@ -86,7 +86,7 @@ module Input_Controller (
             begin
                 if (~button_data_in && ~button_lock) // Select button pressed = 3
                 begin
-                    button_data_out <= select_button;
+                    button_data_out <= SELECT_BUTTON;
                     button_lock <= 1'b1;
                 end
                 if (slow_clk == 1'b1) 
@@ -98,7 +98,7 @@ module Input_Controller (
             begin
                 if (~button_data_in && ~button_lock) // Start button pressed = 4
                 begin
-                    button_data_out <= start_button;
+                    button_data_out <= START_BUTTON;
                     button_lock <= 1'b1;
                     nes_reset <= 1'b1;
                 end
@@ -111,7 +111,7 @@ module Input_Controller (
             begin
                 if (~button_data_in && ~button_lock) // Up button pressed = 5
                 begin
-                    button_data_out <= up_button;
+                    button_data_out <= UP_BUTTON;
                     button_lock <= 1'b1;
                 end
                 if (slow_clk == 1'b1) 
@@ -123,7 +123,7 @@ module Input_Controller (
             begin
                 if (~button_data_in && ~button_lock) // Down button pressed = 6
                 begin
-                    button_data_out <= down_button;
+                    button_data_out <= DOWN_BUTTON;
                     button_lock <= 1'b1;
                 end
                 if (slow_clk == 1'b1) 
@@ -135,7 +135,7 @@ module Input_Controller (
             begin
                 if (~button_data_in && ~button_lock) // Left button pressed = 7
                 begin
-                    button_data_out <= left_button;
+                    button_data_out <= LEFT_BUTTON;
                     button_lock <= 1'b1;
                 end
                 if (slow_clk == 1'b1) 
@@ -147,7 +147,7 @@ module Input_Controller (
             begin
                 if (~button_data_in && ~button_lock) // Right button pressed = 8
                 begin
-                    button_data_out <= right_button;
+                    button_data_out <= RIGHT_BUTTON;
                     button_lock <= 1'b1;
                 end
                 if (slow_clk == 1'b1) 
