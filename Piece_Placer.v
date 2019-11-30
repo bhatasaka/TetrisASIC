@@ -63,10 +63,10 @@ begin
 			case (lfsr[2:0])
    	 	    I:
    	 	    begin
-   	 	       block[0]  <= I; 
-   	 	       block[3]  <= I; 
-   	 	       block[6]  <= I; 
-   	 	       block[9]  <= I; 
+   	 	       block[0]  <= I + 1; 
+   	 	       block[3]  <= I + 1; 
+   	 	       block[6]  <= I + 1; 
+   	 	       block[9]  <= I + 1; 
    	 	       reg_1_addr <= NEXT_PIECE_BASE_ADDR + 0;
    	 	       reg_2_addr <= NEXT_PIECE_BASE_ADDR + 3;
    	 	       reg_3_addr <= NEXT_PIECE_BASE_ADDR + 6;
@@ -75,10 +75,10 @@ begin
    	 	    end
    	 	    O:
    	 	    begin
-   	 	       block[6]  <= O; 
-   	 	       block[7]  <= O; 
-   	 	       block[9]  <= O; 
-   	 	       block[10] <= O; 
+   	 	       block[6]  <= O + 1; 
+   	 	       block[7]  <= O + 1; 
+   	 	       block[9]  <= O + 1; 
+   	 	       block[10] <= O + 1; 
    	 	       reg_1_addr <= NEXT_PIECE_BASE_ADDR + 6;
    	 	       reg_2_addr <= NEXT_PIECE_BASE_ADDR + 7;
    	 	       reg_3_addr <= NEXT_PIECE_BASE_ADDR + 9;
@@ -87,10 +87,10 @@ begin
    	 	    end
    	 	    T:
    	 	    begin
-   	 	       block[4]  <= T; 
-   	 	       block[6]  <= T; 
-   	 	       block[7]  <= T; 
-   	 	       block[10] <= T; 
+   	 	       block[4]  <= T + 1; 
+   	 	       block[6]  <= T + 1; 
+   	 	       block[7]  <= T + 1; 
+   	 	       block[10] <= T + 1; 
    	 	       reg_1_addr <= NEXT_PIECE_BASE_ADDR + 4;
    	 	       reg_2_addr <= NEXT_PIECE_BASE_ADDR + 6;
    	 	       reg_3_addr <= NEXT_PIECE_BASE_ADDR + 7;
@@ -99,10 +99,10 @@ begin
    	 	    end
    	 	    S:
    	 	    begin
-   	 	       block[7]  <= S; 
-   	 	       block[8]  <= S; 
-   	 	       block[9]  <= S; 
-   	 	       block[10] <= S; 
+   	 	       block[7]  <= S + 1; 
+   	 	       block[8]  <= S + 1; 
+   	 	       block[9]  <= S + 1; 
+   	 	       block[10] <= S + 1; 
    	 	       reg_1_addr <= NEXT_PIECE_BASE_ADDR + 7;
    	 	       reg_2_addr <= NEXT_PIECE_BASE_ADDR + 8;
    	 	       reg_3_addr <= NEXT_PIECE_BASE_ADDR + 9;
@@ -111,10 +111,10 @@ begin
    	 	    end
    	 	    Z:
    	 	    begin
-   	 	       block[6]  <= Z; 
-   	 	       block[7]  <= Z; 
-   	 	       block[9] <= Z; 
-   	 	       block[10] <= Z; 
+   	 	       block[6]  <= Z + 1; 
+   	 	       block[7]  <= Z + 1; 
+   	 	       block[10] <= Z + 1; 
+   	 	       block[11] <= Z + 1; 
    	 	       reg_1_addr <= NEXT_PIECE_BASE_ADDR + 6;
    	 	       reg_2_addr <= NEXT_PIECE_BASE_ADDR + 7;
    	 	       reg_3_addr <= NEXT_PIECE_BASE_ADDR + 10;
@@ -123,10 +123,10 @@ begin
    	 	    end
    	 	    J:
    	 	    begin
-   	 	       block[4]  <= J; 
-   	 	       block[7]  <= J; 
-   	 	       block[9]  <= J; 
-   	 	       block[10] <= J; 
+   	 	       block[4]  <= J + 1; 
+   	 	       block[7]  <= J + 1; 
+   	 	       block[9]  <= J + 1; 
+   	 	       block[10] <= J + 1; 
    	 	       reg_1_addr <= NEXT_PIECE_BASE_ADDR + 4;
    	 	       reg_2_addr <= NEXT_PIECE_BASE_ADDR + 7;
    	 	       reg_3_addr <= NEXT_PIECE_BASE_ADDR + 9;
@@ -135,10 +135,10 @@ begin
    	 	    end
    	 	    L:
    	 	    begin
-   	 	       block[3]  <= L; 
-   	 	       block[6]  <= L; 
-   	 	       block[9]  <= L; 
-   	 	       block[10] <= L; 
+   	 	       block[3]  <= L + 1; 
+   	 	       block[6]  <= L + 1; 
+   	 	       block[9]  <= L + 1; 
+   	 	       block[10] <= L + 1; 
    	 	       reg_1_addr <= NEXT_PIECE_BASE_ADDR + 3;
    	 	       reg_2_addr <= NEXT_PIECE_BASE_ADDR + 6;
    	 	       reg_3_addr <= NEXT_PIECE_BASE_ADDR + 9;
