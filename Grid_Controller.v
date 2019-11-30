@@ -8,7 +8,6 @@
 // ============================
 
 module Grid_Controller (
-		
 		input clk,
 		input reset,
 		input [3:0] controller_in,
@@ -17,9 +16,22 @@ module Grid_Controller (
 		output reg [7:0] grid_data_out,
 		output reg write_en
 );
-	parameter [3:0] s_place = 4'b0000, s_move_0 = 4'b0001, s_move_1 = 4'b0010, s_move_2 = 4'b0011, s_move_3 = 4'b0100, 
-						  s_move_4 = 4'b0101, s_move_5 = 4'b0110, s_move_6 = 4'b0111, s8 = 4'b1000, s9 = 4'b1001,
-						  s10 = 4'b1010, s11 = 4'b1011, s12 = 4'b1100, s13 = 4'b1101, s_input = 4'b1110;
+	parameter [3:0] s_place_0 	= 4'b0000,
+					s_place_1 	= 4'b0001,
+					s_move_0 	= 4'b0010, 
+					s_move_1 	= 4'b0011, 
+					s_move_2 	= 4'b0100, 
+					s_move_3 	= 4'b0101, 
+					s_move_4 	= 4'b0110, 
+					s_move_5 	= 4'b0111, 
+					s_move_6 	= 4'b1000, 
+					s8 			= 4'b1001, 
+					s9 			= 4'b1010,
+					s10 		= 4'b1011, 
+					s11 		= 4'b1100, 
+					s12 		= 4'b1101, 
+					s13 		= 4'b1110, 
+					s_input 	= 4'b1111;
 
 	parameter [3:0] BTN_START 	= 4'b0100;
 	parameter [7:0] BLOCK_AIR 	= 4'b0000,
@@ -32,25 +44,29 @@ module Grid_Controller (
 					BLOCK_L 	= 4'b0111,
 				BLOCK_BORDER 	= 4'b1000;
 
-	parameter [24:0] SECOND_CLK_INTERVAL = 26'd50000000;
-	parameter THIS_MEM_OUT, PIECE_MEM_OUT;
+	// parameter [24:0] SECOND_CLK_INTERVAL = 26'd50000000;
+	parameter [24:0] SECOND_CLK_INTERVAL = 26'd200;
+	parameter 	THIS_MEM_OUT = 1'b0, 
+				PIECE_MEM_OUT = 1'b1;
 
 	// Piece Placer Wires
 	wire piece_placed, piece_we;
-	wire[7:0] piece_addr, piece_grid_out;
+	wire [7:0] reg_1_addr, reg_2_addr, reg_3_addr, reg_4_addr;
+	wire [7:0] piece_addr, piece_grid_out;
 
 	reg piece_placer_enable, this_we, blocks_will_collide;
 	reg mem_out_ctl;
 	reg [1:0] piece_pos_idx;
-	reg [3:0] state = s_place;
+	reg [3:0] state = s_place_0;
 	reg [7:0] this_addr, this_grid_out;
 
-	//Array of four 8-bit Registers for tracking
+	//Array of four 8-bit Registers for tracking poisition
 	reg [7:0] piece_pos[3:0];
 	reg [7:0] piece_next_pos[3:0];
 	reg [7:0] active_block_data;
 	reg [24:0] tick_interval_counter;
 
+	integer i;
 
 	Piece_Placer piece_placer(
 		.en(piece_placer_enable),
@@ -60,11 +76,11 @@ module Grid_Controller (
 		.placed(piece_placed),
 		.we(piece_we),
 		.addr(piece_addr),
-		.data(),
-		.reg_1_addr(),
-		.reg_2_addr(),
-		.reg_3_addr(),
-		.reg_4_addr()	
+		.data(piece_grid_out),
+		.reg_1_addr(reg_1_addr),
+		.reg_2_addr(reg_2_addr),
+		.reg_3_addr(reg_3_addr),
+		.reg_4_addr(reg_4_addr)	
 	);
 
 
@@ -75,7 +91,7 @@ module Grid_Controller (
 		begin
 			this_grid_out <= 8'd0;
 			grid_address <= 8'd0;
-			state <= s_place;
+			state <= s_place_0;
 			tick_interval_counter <= 25'b0;
 			piece_pos_idx <= 2'b0;
 		end
@@ -92,16 +108,21 @@ module Grid_Controller (
 			end
 
 			case(state)
-				s_place:
+				s_place_0:
 				begin
 					if(piece_placed == 1'b1)
 					begin
-						state <= s_move_0;
+						state <= s_place_1;
 						piece_pos_idx <= 2'b0;
 					end
 					else
-						state <= s_place;
+						state <= s_place_0;
 				end
+				s_place_1:
+				begin
+					state <= s_input;
+				end
+				
 				s_move_0:
 				begin
 					state <= s_move_1;
@@ -112,7 +133,7 @@ module Grid_Controller (
 					if(piece_pos_idx == 2'd3)
 					begin
 						if(blocks_will_collide)
-							state <= s_place; // TODO: Maybe should go to clear line state and check for end of game also
+							state <= s_place_0; // TODO: Maybe should go to clear line state and check for end of game also
 						else
 							state <= s_move_2;
 
@@ -151,7 +172,15 @@ module Grid_Controller (
 				end
 				s_move_6:
 				begin
-					state <= s_place; // TODO: Maybe should go to clear line state
+					if(blocks_will_collide)
+						state <= s_place_0; // TODO: Maybe should go to clear line state
+					else
+						state <= s_input;// TODO: Maybe should go to clear line state and wait for input
+				end
+
+				s_input:
+				begin
+					// do nothing
 				end
 				default:
 				begin
@@ -168,20 +197,36 @@ module Grid_Controller (
 			mem_out_ctl = 1'b0;
 			piece_placer_enable = 1'b0;
 			blocks_will_collide = 1'b0;
+			this_addr = 8'b0;
+			active_block_data = 8'b0;
+			this_grid_out = 8'b0;
+			this_we = 1'b0;
+			for (i = 0; i < 12; i = i + 1)
+			begin
+				piece_pos[i] = 4'b0;
+				piece_next_pos[i] = 4'b0;
+			end
 		end
 		else
 		begin
 			case (state)
-				s_place:
+				s_place_0:
 				begin
 					mem_out_ctl = PIECE_MEM_OUT;
 					piece_placer_enable = 1'b1;
 					blocks_will_collide = 1'b0;
 				end
-				s_move_0: // Find the next address that we need to read from
+				s_place_1: // Update all the addresses to the new ones
 				begin
 					mem_out_ctl = THIS_MEM_OUT;
 					piece_placer_enable = 1'b0;
+					piece_pos[0] = reg_1_addr;
+					piece_pos[1] = reg_2_addr;
+					piece_pos[2] = reg_3_addr;
+					piece_pos[3] = reg_4_addr;
+				end
+				s_move_0: // Find the next address that we need to read from
+				begin
 					if(piece_pos[piece_pos_idx] > 231) // Check if the block is in the starting area
 					begin
 						if(piece_pos[piece_pos_idx] == 8'd241)
@@ -190,7 +235,7 @@ module Grid_Controller (
 							this_addr = 8'd5;
 						else if(piece_pos[piece_pos_idx] == 8'd243)
 							this_addr = 8'd6;
-						else
+						else // If it's in the starting area, but not on the bottom row
 						begin
 							this_addr = piece_pos[piece_pos_idx] + 3;
 						end
@@ -224,14 +269,15 @@ module Grid_Controller (
 					this_we = 1'b1;
 				end
 				s_move_4:
-				begin // Set the data of the previous block to 0
+				begin // Set the data of the previous block to air
 					this_grid_out = 8'b0; 
 					this_addr = piece_pos[piece_pos_idx];
 				end
 				s_move_5:
-				begin // Set the data of the next block to the active block
+				begin // Set the data of the next block to the active block and update the current address
 					this_grid_out = active_block_data;
 					this_addr = piece_next_pos[piece_pos_idx];
+					piece_pos[piece_pos_idx] = piece_next_pos[piece_pos_idx];
 				end
 				s_move_6:
 				begin // After 
@@ -245,7 +291,7 @@ module Grid_Controller (
 	// Multiplexor to choose the write enable signal going to memory
 	always @ (mem_out_ctl, this_we, this_addr, this_grid_out, piece_we, piece_addr, piece_grid_out)
 	begin
-		if(mem_out_ctl)
+		if(mem_out_ctl == THIS_MEM_OUT)
 		begin
 			write_en = this_we;
 			grid_address = this_addr;
