@@ -15,9 +15,6 @@ module Grid_Controller (
 	assign fsmState = state;
 
 
-
-	
-	
 	// Define the next state combinational circuit
 	always @(posedge clock)
 	 begin
