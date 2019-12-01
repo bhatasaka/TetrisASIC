@@ -27,13 +27,16 @@ module Grid_Controller (
 					s_move_6 	= 4'd8, 
 					s_move_7	= 4'd9, 
 					s_move_8	= 4'd10,
-					s10 		= 4'd11, 
+					s_input 	= 4'd11, 
 					s11 		= 4'd12, 
 					s12 		= 4'd13, 
 					s13 		= 4'd14, 
-					s_input 	= 4'b1111;
+					s_14	 	= 4'd15;
 
-	parameter [3:0] BTN_START 	= 4'b0100;
+	parameter [3:0] BTN_START 	= 4'b0100,
+					BTN_LEFT	= 4'b0000,
+					BTN_RIGHT	= 4'b0000;
+
 	parameter [7:0] BLOCK_AIR 	= 4'b0000,
 					BLOCK_I 	= 4'b0001,
 					BLOCK_O 	= 4'b0010,
@@ -55,7 +58,7 @@ module Grid_Controller (
 	wire [7:0] piece_addr, piece_grid_out;
 
 	reg piece_placer_enable, this_we, piece_will_collide;
-	reg mem_out_ctl;
+	reg mem_out_ctl, has_moved, need_to_move;
 	reg [1:0] piece_pos_idx;
 	reg [3:0] state = s_place_0;
 	reg [7:0] this_addr, this_grid_out;
@@ -94,13 +97,17 @@ module Grid_Controller (
 			state <= s_place_0;
 			tick_interval_counter <= 25'b0;
 			piece_pos_idx <= 2'b0;
+			has_moved <= 1'b1; // Default true
 		end
 		else
 		begin
 			if (tick_interval_counter == SECOND_CLK_INTERVAL)
 			begin
 				tick_interval_counter <= 26'b0;
-				state <= s_move_0;
+				 // If we are just sitting, waiting for input, then we are good to move the block down
+				if(state == s_input)
+					state <= s_move_0;
+				// otherwise, don't increment the counter and we'll eventually move the block down when whatever we're doing finishes
 			end
 			else
 			begin
@@ -200,7 +207,12 @@ module Grid_Controller (
 
 				s_input:
 				begin
-					// do nothing
+					if (need_to_move)
+					begin
+						has_moved <= false;
+						//Move the piece
+						// has_moved <= true;
+					end
 				end
 				default:
 				begin
@@ -210,6 +222,7 @@ module Grid_Controller (
 		end
 	end
 
+	// OUTPUT Logic always block
 	always @(state, reset)
 	begin
 		if(reset)
@@ -348,6 +361,21 @@ module Grid_Controller (
 			write_en = piece_we;
 			grid_address = piece_addr;
 			grid_data_out = piece_grid_out;
+		end
+	end
+
+	always @(controller_in)
+	begin
+		if (!has_moved)
+		begin
+			need_to_move <= 1'b0;
+		end
+		else
+		begin
+			if (controller_in == BTN_LEFT || controller_in == BTN_RIGHT)
+			begin
+				need_to_move <= 1'b1;
+			end
 		end
 	end
 endmodule
