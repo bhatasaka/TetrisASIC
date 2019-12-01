@@ -16,21 +16,21 @@ module Grid_Controller (
 		output reg [7:0] grid_data_out,
 		output reg write_en
 );
-	parameter [3:0] s_place_0 	= 4'b0000,
-					s_place_1 	= 4'b0001,
-					s_move_0 	= 4'b0010, 
-					s_move_1 	= 4'b0011, 
-					s_move_2 	= 4'b0100, 
-					s_move_3 	= 4'b0101, 
-					s_move_4 	= 4'b0110, 
-					s_move_5 	= 4'b0111, 
-					s_move_6 	= 4'b1000, 
-					s8 			= 4'b1001, 
-					s9 			= 4'b1010,
-					s10 		= 4'b1011, 
-					s11 		= 4'b1100, 
-					s12 		= 4'b1101, 
-					s13 		= 4'b1110, 
+	parameter [3:0] s_place_0 	= 4'd0,
+					s_place_1 	= 4'd1,
+					s_move_0 	= 4'd2, 
+					s_move_1 	= 4'd3, 
+					s_move_2 	= 4'd4, 
+					s_move_3 	= 4'd5, 
+					s_move_4 	= 4'd6, 
+					s_move_5 	= 4'd7, 
+					s_move_6 	= 4'd8, 
+					s_move_7	= 4'd9, 
+					s_move_8	= 4'd10,
+					s10 		= 4'd11, 
+					s11 		= 4'd12, 
+					s12 		= 4'd13, 
+					s13 		= 4'd14, 
 					s_input 	= 4'b1111;
 
 	parameter [3:0] BTN_START 	= 4'b0100;
@@ -54,7 +54,7 @@ module Grid_Controller (
 	wire [7:0] reg_1_addr, reg_2_addr, reg_3_addr, reg_4_addr;
 	wire [7:0] piece_addr, piece_grid_out;
 
-	reg piece_placer_enable, this_we, blocks_will_collide;
+	reg piece_placer_enable, this_we, piece_will_collide;
 	reg mem_out_ctl;
 	reg [1:0] piece_pos_idx;
 	reg [3:0] state = s_place_0;
@@ -132,7 +132,7 @@ module Grid_Controller (
 					// Go back and forth between states move_0 and move_1 4 times
 					if(piece_pos_idx == 2'd3)
 					begin
-						if(blocks_will_collide)
+						if(piece_will_collide)
 							state <= s_place_0; // TODO: Maybe should go to clear line state and check for end of game also
 						else
 							state <= s_move_2;
@@ -152,27 +152,47 @@ module Grid_Controller (
 				s_move_3: // Set active block
 				begin
 					state <= s_move_4;
+					piece_pos_idx <= 2'd0;
 				end
 				s_move_4: // Clear old grid_mem
 				begin
 					state <= s_move_5;
+					piece_pos_idx <= piece_pos_idx + 2'b1;
 				end
-				s_move_5: // Set new grid_mem
+				s_move_5: 
 				begin
 					if(piece_pos_idx == 2'd3)
 					begin
 						state <= s_move_6;
-						piece_pos_idx = 2'b0;
+						piece_pos_idx <= 2'b0;
 					end
 					else
 					begin
 						state <= s_move_4;
-						piece_pos_idx = piece_pos_idx + 2'b1;
+						piece_pos_idx <= piece_pos_idx + 2'b1;
 					end
 				end
-				s_move_6:
+				s_move_6:// Set new grid_mem with 6 and 7
 				begin
-					if(blocks_will_collide)
+					state <= s_move_7;
+					piece_pos_idx <= piece_pos_idx + 2'b1;
+				end
+				s_move_7:
+				begin
+					if(piece_pos_idx == 2'd3)
+					begin
+						state <= s_move_8;
+						piece_pos_idx <= 2'b0;
+					end
+					else
+					begin
+						state <= s_move_6;
+						piece_pos_idx <= piece_pos_idx + 2'b1;
+					end
+				end
+				s_move_8:
+				begin
+					if(piece_will_collide)
 						state <= s_place_0; // TODO: Maybe should go to clear line state
 					else
 						state <= s_input;// TODO: Maybe should go to clear line state and wait for input
@@ -196,7 +216,7 @@ module Grid_Controller (
 		begin
 			mem_out_ctl = 1'b0;
 			piece_placer_enable = 1'b0;
-			blocks_will_collide = 1'b0;
+			piece_will_collide = 1'b0;
 			this_addr = 8'b0;
 			active_block_data = 8'b0;
 			this_grid_out = 8'b0;
@@ -214,7 +234,7 @@ module Grid_Controller (
 				begin
 					mem_out_ctl = PIECE_MEM_OUT;
 					piece_placer_enable = 1'b1;
-					blocks_will_collide = 1'b0;
+					piece_will_collide = 1'b0;
 				end
 				s_place_1: // Update all the addresses to the new ones
 				begin
@@ -230,11 +250,11 @@ module Grid_Controller (
 					if(piece_pos[piece_pos_idx] > 231) // Check if the block is in the starting area
 					begin
 						if(piece_pos[piece_pos_idx] == 8'd241)
-							this_addr = 8'd4;
-						else if(piece_pos[piece_pos_idx] == 8'd242)
 							this_addr = 8'd5;
-						else if(piece_pos[piece_pos_idx] == 8'd243)
+						else if(piece_pos[piece_pos_idx] == 8'd242)
 							this_addr = 8'd6;
+						else if(piece_pos[piece_pos_idx] == 8'd243)
+							this_addr = 8'd7;
 						else // If it's in the starting area, but not on the bottom row
 						begin
 							this_addr = piece_pos[piece_pos_idx] + 3;
@@ -251,36 +271,62 @@ module Grid_Controller (
 
 				s_move_1: // Read the next block position to see if it's available
 				begin
-					// Check if the block below isn't air and isn't active, the the block will collide
-					if(tetris_grid_in[3:0] != BLOCK_AIR && tetris_grid_in[7] != 1'b1)  
-						blocks_will_collide = 1'b1;
-					else
-						blocks_will_collide = blocks_will_collide;
+					// We are now reading the addresses directly below each block
+					// And we need to check if we are able to move this block down
+					// 
+					// If a block is in the starting area, it will always be able to move down
+					// If a block is in the game area, we have to test if the block below it is
+					// not air and not itself. If so, then the block can't move down
+					// Also, if the block is in the game area, we have to check if the address below it
+					// is not in the game area (aka the block is at the bottom). If so, the block can't move down.
+					// 
+					// First, we have to check if the original address is in the starting area. If it is,
+					// then we know that, for this block, don't modify piece collide
+					// 
+					// Otherwise, check if the new address is beyond the game area, if it is then the piece will collide
+					// Otherwise, check if the new address is equal to another address, if it is, don't modify piece collision
+					// Otherwise, check if the new block is not air, if it isn't air, then the piece will collide
+
+					// Check that the block is in the game area
+					if(piece_pos[piece_pos_idx] >= 8'd1 && piece_pos[piece_pos_idx] <= 8'd231)
+					begin
+						if( piece_next_pos[piece_pos_idx] != piece_pos[0] &&
+						    piece_next_pos[piece_pos_idx] != piece_pos[1] &&
+						    piece_next_pos[piece_pos_idx] != piece_pos[2] &&
+						    piece_next_pos[piece_pos_idx] != piece_pos[3] )
+						begin
+							if(tetris_grid_in[3:0] != BLOCK_AIR)
+								piece_will_collide = 1'b0;
+							else
+								piece_will_collide = piece_will_collide;
+						end
+					end
 				end
 
 				s_move_2: // Set the address to get the block data of the active block
 				begin
-					this_addr = piece_pos[piece_pos_idx];
+					this_addr = piece_pos[0];
 				end
 
-				s_move_3: // Set the active block data and write enable
+				s_move_3: // Get the active block data
 				begin
 					active_block_data = tetris_grid_in;
-					this_we = 1'b1;
 				end
-				s_move_4:
-				begin // Set the data of the previous block to air
-					this_grid_out = 8'b0; 
+				s_move_4, s_move_5:
+				begin // Set the data of the old block positions to air
+					this_we = 1'b1;
+					this_grid_out = 8'b0;
 					this_addr = piece_pos[piece_pos_idx];
 				end
-				s_move_5:
+				s_move_6, s_move_7:
 				begin // Set the data of the next block to the active block and update the current address
+					this_we = 1'b1;
 					this_grid_out = active_block_data;
 					this_addr = piece_next_pos[piece_pos_idx];
 					piece_pos[piece_pos_idx] = piece_next_pos[piece_pos_idx];
 				end
-				s_move_6:
-				begin // After 
+				s_move_8:
+				begin // After clear write enable
 					this_we = 1'b0;
 				end
 
