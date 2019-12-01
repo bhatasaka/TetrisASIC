@@ -15,7 +15,7 @@ module Input_Controller (
     input reset,
     input button_data_in,
     output reg nes_reset,
-    output reg [3:0] button_data_out,
+    //output reg [3:0] button_data_out,
 
     output latch_tb,
     output slow_clk_tb,
@@ -30,7 +30,7 @@ module Input_Controller (
     reg slow_clk = 1'b0;
     reg latch = 1'b0;
     reg pulse = 1'b0;
-    //reg [3:0] button_data_out = 4'b0;
+    reg [3:0] button_data_out = 4'b0;
 
     assign slow_clk_tb = slow_clk;
     assign latch_tb = latch;
@@ -168,9 +168,10 @@ module Input_Controller (
                 end
                 slow_clk <= ~slow_clk;
                 slow_clk_counter <= 19'd0;
-                if (button_lock) 
+                if (button_lock)
                 begin
                     button_lock <= 1'b0;
+                    button_data_out <= 1'b0;
                 end
             end
         endcase
