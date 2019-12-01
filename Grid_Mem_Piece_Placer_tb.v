@@ -27,6 +27,8 @@ module Grid_Mem_Piece_Placer_tb;
 
 	parameter FULL_CLK = 20;
 	parameter HALF_CLK = 10;
+	parameter PIECE_BASE_ADDR = 240;
+	parameter PIECE_MAX_ADDR = 251;
 
 	Grid_Mem uut_grid (
 		.data_a(data),
@@ -157,11 +159,11 @@ module Grid_Mem_Piece_Placer_tb;
 		//Go one past piece max (mem max is 255, 244+ unused)
 		//To ensure we aren't writing there.
 		#FULL_CLK;
-		for (i = 232; i < 245; i = i + 1)
+		for (i = PIECE_BASE_ADDR; i <= PIECE_MAX_ADDR; i = i + 1)
 		begin
 			read_addr = i[7:0];
 			#FULL_CLK;
-			read_piece_from_mem[i - 232] = out_b;
+			read_piece_from_mem[i - PIECE_BASE_ADDR] = out_b;
 			
 		//	$display("Piece Mem @[%d]: [%d]", i, out_b);
 		end

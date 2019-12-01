@@ -12,7 +12,7 @@ module Piece_Placer(
     output reg [7:0] reg_4_addr
 );
 
-parameter NEXT_PIECE_BASE_ADDR = 8'd232;
+parameter NEXT_PIECE_BASE_ADDR = 8'd240;
 parameter [2:0] I = 3'd0, O = 3'd1, T = 3'd2, S = 3'd3, Z = 3'd4, J = 3'd5, L = 3'd6;
 
 reg [7:0] block[11:0];
