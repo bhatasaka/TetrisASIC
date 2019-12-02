@@ -444,20 +444,20 @@ module Grid_Controller (
 				end
 				s_input_2: // Move right, get next addresses, don't worry about overflow, or edges yet
 				begin
-					piece_next_pos[0] = piece_pos[0] + 8'd255;
-					piece_next_pos[1] = piece_pos[1] + 8'd255;
-					piece_next_pos[2] = piece_pos[2] + 8'd255;
-					piece_next_pos[3] = piece_pos[3] + 8'd255;
+					piece_next_pos[0] = piece_pos[0] - 8'd1;
+					piece_next_pos[1] = piece_pos[1] - 8'd1;
+					piece_next_pos[2] = piece_pos[2] - 8'd1;
+					piece_next_pos[3] = piece_pos[3] - 8'd1;
 				end
 				s_input_3:
 				begin
 					for(i = 0; i < GRID_END_ADDR; i = i + 12)
 					begin
 						// Check if moving the piece will result in a bad area
-						if(piece_next_pos[0] == i || piece_next_pos[0] == i+11
-						|| piece_next_pos[1] == i || piece_next_pos[1] == i+11
-						|| piece_next_pos[2] == i || piece_next_pos[2] == i+11
-						|| piece_next_pos[3] == i || piece_next_pos[3] == i+11)
+						if(piece_next_pos[0] == i[7:0] || piece_next_pos[0] == ((i+11)[7:0])
+						|| piece_next_pos[1] == i[7:0] || piece_next_pos[1] == ((i+11)[7:0])
+						|| piece_next_pos[2] == i[7:0] || piece_next_pos[2] == ((i+11)[7:0])
+						|| piece_next_pos[3] == i[7:0] || piece_next_pos[3] == ((i+11)[7:0]))
 						begin
 							piece_will_collide = 1'b1;
 						end
