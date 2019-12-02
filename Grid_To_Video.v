@@ -14,7 +14,7 @@ module Grid_To_Video (
 	input [7:0] vga_data,
     output [7:0] grid_addr,
     output reg [7:0] pixel_rgb,
-    output reg [15:0] vga_addr
+    output reg [12:0] vga_addr
 );
 
     reg px_clk;
@@ -34,15 +34,15 @@ module Grid_To_Video (
     parameter L_PIECE = 4'd7;
     parameter BORDER =  4'd8;
 
-    parameter AIR_ADDR =    16'b0;
-    parameter I_PIECE_ADDR =      16'd576;
-    parameter O_PIECE_ADDR =      16'd1152;
-    parameter T_PIECE_ADDR =      16'd1728;
-    parameter S_PIECE_ADDR =      16'd2304;
-    parameter Z_PIECE_ADDR =      16'd2880;
-    parameter J_PIECE_ADDR =      16'd3456;
-    parameter L_PIECE_ADDR =      16'd4032;
-    parameter BORDER_ADDR = 16'd4608;
+    parameter AIR_ADDR =    13'b0;
+    parameter I_PIECE_ADDR =      13'd576;
+    parameter O_PIECE_ADDR =      13'd1152;
+    parameter T_PIECE_ADDR =      13'd1728;
+    parameter S_PIECE_ADDR =      13'd2304;
+    parameter Z_PIECE_ADDR =      13'd2880;
+    parameter J_PIECE_ADDR =      13'd3456;
+    parameter L_PIECE_ADDR =      13'd4032;
+    parameter BORDER_ADDR = 13'd4608;
 
 
     assign grid_addr = 12 * grid_row + grid_col;

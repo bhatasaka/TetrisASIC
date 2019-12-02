@@ -1,10 +1,10 @@
 module VGA_Mem
-#(parameter DATA_WIDTH=8, parameter ADDR_WIDTH=16)
+#(parameter DATA_WIDTH=8, parameter ADDR_WIDTH=13)
 (
 	input [(DATA_WIDTH-1):0] data_a,
-	input [(ADDR_WIDTH-1):0] addr_a, addr_b,
+	input [(ADDR_WIDTH-1):0] addr_a,
 	input we_a, clk,
-	output reg [(DATA_WIDTH-1):0] q_a, q_b
+	output reg [(DATA_WIDTH-1):0] q_a
 );
 
 	// Declare the RAM variable
@@ -31,14 +31,4 @@ module VGA_Mem
 			q_a <= ram[addr_a];
 		end
 	end
-
-	// Port B 
-	always @ (posedge clk)
-	begin
-		if(addr_b == addr_a && we_a)
-			q_b <= data_a;
-		else
-			q_b <= ram[addr_b];
-	end
-
 endmodule
