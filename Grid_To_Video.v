@@ -119,7 +119,7 @@ module Grid_To_Video (
         end
     end
 
-    always @ (negedge px_en, reset)
+    always @ (negedge px_en, posedge reset)
     begin
         if(reset)
         begin

@@ -73,7 +73,7 @@ module Grid_Controller (
 	reg piece_placer_enable, line_clearer_enable, this_we, piece_will_collide;
 	reg has_moved, move_right, move_left;
 	reg [1:0] piece_pos_idx, mem_out_ctl;
-	reg [4:0] state = s_place_0;
+	reg [4:0] state;
 	reg [7:0] this_addr, this_grid_out;
 
 	//Array of four 8-bit Registers for tracking poisition
@@ -224,7 +224,7 @@ module Grid_Controller (
 				s_move_8:
 				begin
 					state <= s_input_0; 
-					has_moved = 1'b1;
+					has_moved <= 1'b1;
 				end
 
 				s_input_0:
@@ -271,7 +271,7 @@ module Grid_Controller (
 						if(piece_will_collide)
 						begin
 							state <= s_input_0; // Just go back to input
-							has_moved = 1'b1;
+							has_moved <= 1'b1;
 						end
 						else
 							state <= s_move_2; // Move on
