@@ -22,6 +22,7 @@ module Line_Clearer(
 	reg [7:0] check_addr;
 	reg [7:0] shift_addr;
 	reg [7:0] data;
+	reg [3:0] addr_cnt;
 	
 	reg clear_line, check_line;
 	reg line_cleared, advance_line;
@@ -59,6 +60,7 @@ module Line_Clearer(
 			shift_addr <= 8'b0;
 			data <= 8'b0;
 			data_out <= 8'b0;
+			addr_cnt <= 4'b0;
 		end
 		else
 		begin
@@ -69,10 +71,11 @@ module Line_Clearer(
 					current_shift_line <= current_line;
 					clear_state <= clear_state + 1'b1;
 					line_cleared <= 1'b0;
+					addr_cnt <= 4'b0;
 				end
 				
 				//Read Grid Mem
-				1, 4, 7, 10, 13, 16, 19, 22, 25, 28:
+				1, 5, 9, 13, 17, 21, 25, 29, 33, 37, 41:
 				begin
 					//Ignore reading line above if we are at the top line
 					if (current_shift_line == LINE_1)
@@ -81,14 +84,21 @@ module Line_Clearer(
 					end
 					else
 					begin
-						shift_addr <= (current_shift_line - LINE_OFFSET);
+						shift_addr <= (current_shift_line - LINE_OFFSET) + addr_cnt;
 					end
 	
 					clear_state <= clear_state + 1'b1;
 				end
 				
 				//Save value
-				2, 5, 8, 11, 14, 17, 20, 23, 26, 29:
+				2, 6, 10, 14, 18, 22, 26, 30, 34, 38, 42:
+				begin
+					clear_state <= clear_state + 1'b1;
+					shift_addr <= current_shift_line + addr_cnt - 1'b1;
+				end
+	
+				//Write Grid Mem
+				3, 7, 11, 15, 19, 23, 27, 31, 35, 39, 43:
 				begin
 					//Overwrite with air if we are at the top line
 					if (current_shift_line == LINE_1)
@@ -100,21 +110,20 @@ module Line_Clearer(
 						data <= data_in;
 					end
 	
-					shift_addr <= current_shift_line;
 					we <= 1'b1;
 					clear_state <= clear_state + 1'b1;
 				end
-	
-				//Write Grid Mem
-				3, 6, 9, 12, 15, 18, 21, 24, 27, 30:
+
+				4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44:
 				begin
 					data_out <= data;
 					we <= 1'b0;
 					clear_state <= clear_state + 1'b1;
+					addr_cnt <= addr_cnt + 1'b1;
 				end
 	
 				//Tidy up or go to the next line to shift
-				31:
+				45:
 				begin
 					//Next line up
 					if (current_shift_line != LINE_1)
@@ -129,6 +138,9 @@ module Line_Clearer(
 						//Will hit default state to clear everything
 						clear_state <= clear_state + 1'b1;
 					end
+
+					we <= 1'b0;
+					addr_cnt <= 4'b0;
 				end
 
 				default:
@@ -140,6 +152,7 @@ module Line_Clearer(
 					shift_addr <= 8'b0;
 					data <= 8'b0;
 					data_out <= 8'b0;
+					addr_cnt <= 4'b0;
 				end
 			endcase
 		end
@@ -168,7 +181,13 @@ module Line_Clearer(
 					check_block_number <= check_block_number + 1'b1;
 				end
 				//read memory for each block, see if it is air or not
-				1, 2, 3, 4, 5, 6, 7, 8, 9, 10:
+				1:
+				begin
+					check_addr <= check_addr + 8'b1;
+					check_block_number <= check_block_number + 1'b1;
+				end
+
+				2, 3, 4, 5, 6, 7, 8, 9, 10, 11:
 				begin
 					//If not an air block, increment counter
 					if (data_in != 8'b0)
@@ -183,43 +202,48 @@ module Line_Clearer(
 					check_addr <= check_addr + 8'b1;
 					check_block_number <= check_block_number + 1'b1;
 				end
+
 				//Hold state while we wait for the line to clear (if needed)
-				11:
+				12:
 				begin
-					//If we found a line with no air blocks, it needs cleared
-					if (block_count == LINE_WIDTH)
-					begin
-						clear_line <= 1'b1;
-						advance_line <= 1'b0;
-					end
-					//Otherwise go to the next line
-					else
-					begin
-						clear_line <= 1'b0;
-						advance_line <= 1'b1;
-					end
-	
 					//If a line has been or does not need to be cleared, go to the next line to check
-					if ((line_cleared == 1'b1) || (advance_line == 1'b1))
+					if (clear_line == 1'b1)
 					begin
-						//This will hit the default state which will clear everything including advance line pulse
-						check_block_number <= check_block_number + 1'b1;
-						clear_line <= 1'b0;
-						advance_line <= 1'b1;
+						if ((line_cleared == 1'b1))
+						begin
+							//This will hit the default state which will clear everything including advance line pulse
+							check_block_number <= check_block_number + 1'b1;
+							clear_line <= 1'b0;
+							advance_line <= 1'b1;
+						end
+						//Otherwise stay put
+						else
+						begin
+							check_block_number <= check_block_number;
+						end
 					end
-					//Otherwise stay put
 					else
 					begin
-						check_block_number <= check_block_number;
-			//			clear_line <= clear_line;
-			//			advance_line <= 1'b0;
+						//If we found a line with no air blocks, it needs cleared
+						if (block_count == LINE_WIDTH)
+						begin
+							clear_line <= 1'b1;
+							advance_line <= 1'b0;
+						end
+						//Otherwise go to the next line
+						else
+						begin
+							clear_line <= 1'b0;
+							advance_line <= 1'b1;
+							check_block_number <= check_block_number + 1'b1;
+						end
 					end
 				end
 				//If we end up in a wonky state, go back to the init state
 				default:
 				begin
 					block_count <= 4'b0;
-					check_addr <= current_line;
+					check_addr <= 8'b0;
 					check_block_number <= 4'd0;
 					clear_line <= 1'b0;
 					advance_line <= 1'b0;

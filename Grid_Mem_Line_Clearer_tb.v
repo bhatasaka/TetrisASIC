@@ -1,59 +1,70 @@
 `timescale 100ps/100ps
 
-module Grid_Mem_Piece_Placer_tb;
+module Grid_Mem_Line_Clearer_tb;
 
 	reg clk;
 	reg en;
 	reg grid_rst;
 	reg lc_rst;
-	reg [7:0] tb_addr;
 
 	wire cleared;
-	wire we;
+	wire lc_we;
 	wire [7:0] lc_addr;
-	wire [7:0] mem_in;
-	wire [7:0] mem_out;
-	wire [7:0] tb_out;
+	wire [7:0] lc_data;
+	wire [7:0] data_out;
+	wire [7:0] dummy_out;
 
-	reg mux_sel
+	reg mux_sel;
+	reg we;
+	reg tb_we;
 	reg [7:0] data;
+	reg [7:0] addr;
 	reg [7:0] tb_data;
+	reg [7:0] tb_addr;
+	reg [7:0] dummy_addr;
 
 	parameter FULL_CLK = 20;
 	parameter HALF_CLK = 10;
+	parameter MAX_ADDR = 239;
 
-	integer i;
+	integer i, dumpfile, fulldump;
 
 	Grid_Mem uut_grid (
 		.data_a(data),
-		.addr_a(lc_addr),
-		.addr_b(tb_addr),
+		.addr_a(addr),
+		.addr_b(dummy_addr),
 		.we_a(we),
 		.reset(grid_rst),
 		.clk(clk),
-		.q_a(mem_out),
-		.q_b(tb_out)
+		.q_a(data_out),
+		.q_b(dummy_out)
 	);
     
-	Line_Clearer uut(
+	Line_Clearer uut_lc(
     .en(en),
     .clk(clk),
     .rst(lc_rst),
-    .data_in(mem_out),
+    .data_in(data_out),
     .cleared(cleared),
-    .we(we),
+    .we(lc_we),
     .addr(lc_addr),
-    .data_out(mem_in)
+    .data_out(lc_data)
 	);
 
 	initial
 	begin
-		clk = 1'b1;
+		dumpfile = $fopen("/home/eastland/ece6710/prjkt/TetrisASIC/dump_file.hex", "w");
+		fulldump = $fopen("/home/eastland/ece6710/prjkt/TetrisASIC/full_dump.hex", "w");
+
+		clk = 1'b0;
 		grid_rst = 1'b0;
 		lc_rst = 1'b0;
 		en = 1'b0;
 		mux_sel = 1'b0;
 		tb_addr = 8'b0;
+		tb_data = 8'b0;
+		we = 1'b0;
+		tb_we = 1'b0;
 
 		#FULL_CLK;
 
@@ -66,6 +77,8 @@ module Grid_Mem_Piece_Placer_tb;
 		lc_rst = 1'b0;
 
 		#FULL_CLK;
+
+		tb_we = 1'b1;
 
 		for (i = 238; i > 228; i = i - 1)
 		begin
@@ -84,7 +97,7 @@ module Grid_Mem_Piece_Placer_tb;
 		for (i = 214; i > 204; i = i - 1)
 		begin
 			tb_addr = i;
-			tb_data = 8'd1;
+			tb_data = i - 204;
 			#FULL_CLK;
 		end
 
@@ -95,18 +108,174 @@ module Grid_Mem_Piece_Placer_tb;
 		tb_addr = 8'd220;
 		tb_data = 8'd3;
 		#FULL_CLK;
-			
+
+		tb_we = 1'b0;
+		#FULL_CLK;
+
+		//dump ram to file
+		$fwrite(dumpfile, "Init Mem for Line Clear Test: Basic\n");
+
+		for (i = 0; i < 240; i = i + 1)
+		begin
+			tb_addr = i[7:0];
+			case(i)
+				11, 23, 35, 47, 59, 71, 83, 95, 107, 119, 131, 143, 155, 167, 179, 191, 203, 215, 227, 239:
+				begin
+					$fwrite(dumpfile, "%h\n", uut_grid.ram[i]);
+				end
+				default:
+				begin
+					$fwrite(dumpfile, "%h\t", uut_grid.ram[i]);
+				end
+			endcase
+		end
+
+		$fwrite(dumpfile, "\n\n");
+
+		#FULL_CLK;
+		mux_sel = 1'b1;
+		en = 1'b1;
+		
+		//Wait enough time for the grid to clear
+		#50000;
+
+		en = 1'b0;
+		mux_sel = 1'b0;
+		#FULL_CLK;
+
+		//dump ram to file
+		$fwrite(dumpfile, "Mem After Line Clear Test: Basic\n");
+
+		for (i = 0; i < 240; i = i + 1)
+		begin
+			tb_addr = i[7:0];
+			case(i)
+				11, 23, 35, 47, 59, 71, 83, 95, 107, 119, 131, 143, 155, 167, 179, 191, 203, 215, 227, 239:
+				begin
+					$fwrite(dumpfile, "%h\n", uut_grid.ram[i]);
+				end
+				default:
+				begin
+					$fwrite(dumpfile, "%h\t", uut_grid.ram[i]);
+				end
+			endcase
+		end
+
+		$fwrite(dumpfile, "\n\n");
+
+		tb_we = 1'b1;
+
+		for (i = 0; i < MAX_ADDR; i = i + 1)
+		begin
+			tb_addr = i;
+
+			case (i)
+				0, 12, 24, 36, 48, 60, 72, 84, 96, 108, 120, 132, 144, 156, 168, 180, 192, 204, 216, 228, 11, 23, 35, 47, 59, 71, 83, 95, 107, 119, 131, 143, 155, 167, 179, 191, 203, 215, 227, 239:
+					tb_data = 8'd8;
+				97, 114, 27, 69, 202, 190:
+					tb_data = 8'd0;
+				default:
+					tb_data = 8'd6;
+			endcase
+
+			#FULL_CLK;
+		end
+		
+		tb_we = 1'b0;
+
+		dumpfile = $fopen("/home/eastland/ece6710/prjkt/TetrisASIC/dump_file_2.hex", "w");
+
+		//dump ram to file
+		$fwrite(dumpfile, "Init Mem for Line Clear Test: 97 percent Full\n");
+
+		for (i = 0; i < 240; i = i + 1)
+		begin
+			tb_addr = i[7:0];
+			case(i)
+				11, 23, 35, 47, 59, 71, 83, 95, 107, 119, 131, 143, 155, 167, 179, 191, 203, 215, 227, 239:
+				begin
+					$fwrite(dumpfile, "%h\n", uut_grid.ram[i]);
+				end
+				default:
+				begin
+					$fwrite(dumpfile, "%h\t", uut_grid.ram[i]);
+				end
+			endcase
+		end
+
+		$fwrite(dumpfile, "\n\n");
+
+		#FULL_CLK;
+		mux_sel = 1'b1;
+		en = 1'b1;
+		
+		//Wait enough time for the grid to clear
+		#500000;
+
+		en = 1'b0;
+		mux_sel = 1'b0;
+		#FULL_CLK;
+
+		//dump ram to file
+		$fwrite(dumpfile, "Mem After Line Clear Test: 97 Percent Full\n");
+
+		for (i = 0; i < 240; i = i + 1)
+		begin
+			tb_addr = i[7:0];
+			case(i)
+				11, 23, 35, 47, 59, 71, 83, 95, 107, 119, 131, 143, 155, 167, 179, 191, 203, 215, 227, 239:
+				begin
+					$fwrite(dumpfile, "%h\n", uut_grid.ram[i]);
+				end
+				default:
+				begin
+					$fwrite(dumpfile, "%h\t", uut_grid.ram[i]);
+				end
+			endcase
+		end
+
+		$fwrite(dumpfile, "\n\n");
+
+		#FULL_CLK;
+
 	end
 
-	always @(mux_sel)
+	always @(posedge uut_lc.advance_line)
+	begin
+		//dump ram to file
+		$fwrite(fulldump, "Mem After Line Clear\n");
+
+		for (i = 0; i < 240; i = i + 1)
+		begin
+			tb_addr = i[7:0];
+			case(i)
+				11, 23, 35, 47, 59, 71, 83, 95, 107, 119, 131, 143, 155, 167, 179, 191, 203, 215, 227, 239:
+				begin
+					$fwrite(fulldump, "%h\n", uut_grid.ram[i]);
+				end
+				default:
+				begin
+					$fwrite(fulldump, "%h\t", uut_grid.ram[i]);
+				end
+			endcase
+		end
+
+		$fwrite(fulldump, "\n\n");
+	end
+
+	always @(*)
 	begin
 		if (mux_sel == 1'b0)
 		begin
+			addr = tb_addr;
 			data = tb_data;
+			we = tb_we;
 		end
 		else
 		begin
-			data = mem_in;
+			addr = lc_addr;
+			data = lc_data;
+			we = lc_we;
 		end
 	end
 
@@ -115,15 +284,5 @@ module Grid_Mem_Piece_Placer_tb;
   	#HALF_CLK
     clk <= ~clk;
   end
-		/*
-		$display("+-----------+\n|%d|%d|%d|\n|%d|%d|%d|\n|%d|%d|%d|\n|%d|%d|%d|\n+-----------+", 
-				read_piece_from_mem[0], read_piece_from_mem[1], read_piece_from_mem[2], 
-				read_piece_from_mem[3], read_piece_from_mem[4], read_piece_from_mem[5], 
-				read_piece_from_mem[6], read_piece_from_mem[7], read_piece_from_mem[8], 
-				read_piece_from_mem[9], read_piece_from_mem[10], read_piece_from_mem[11]
-		);             
-
-		$display("\n");
-		*/
 
 endmodule
