@@ -50,6 +50,11 @@ always @(posedge clk)
 begin
 		if (~en || rst)
 		begin
+    	for (i = 0; i < 12; i = i + 1)
+      begin
+      	block[i] = 4'b0;
+      end
+    		
 			reg_1_addr <= 8'b0;
 			reg_2_addr <= 8'b0;
 			reg_3_addr <= 8'b0;
@@ -160,12 +165,6 @@ begin
     if (rst)
     begin
         box_number <= 4'b0;
-
-        for (i = 0; i < 12; i = i + 1)
-        begin
-            block[i] = 4'b0;
-        end
-    		
     		placed <= 1'b0;
     		we <= 1'b0;
     		addr <= 8'b0;

@@ -16,7 +16,6 @@ module VGA_Controller (
 	reg v_screen_on;
 	reg [14:0] h_sync_counter;
 	reg [1:0] h_sync_mode;
-	reg [1:0] v_sync_mode;
 	reg [9:0] v_sync_counter;
 	
 	// //For Simulation
@@ -29,7 +28,6 @@ module VGA_Controller (
 	// 	h_sync_counter = 14'd0;
 	// 	v_sync_counter = 10'd0;
 	// 	h_sync_mode = 2'd0;
-	// 	v_sync_mode = 2'd0;
 	// end
 	
 	//enable pixel input
@@ -45,11 +43,9 @@ module VGA_Controller (
 		begin
 			h_sync <= 1'd0;
 			h_screen_on <= 1'd0;
-			v_screen_on <= 1'd0;
 			h_sync_counter <= 14'd0;
 			v_sync_counter <= 10'd0;
 			h_sync_mode <= 2'd0;
-			v_sync_mode <= 2'd0;
 		end
 		else
 		begin
@@ -60,13 +56,19 @@ module VGA_Controller (
 				begin
 					if (h_sync_counter == 14'd1900)
 					begin
+						h_screen_on <= h_screen_on;
 						h_sync <= 1'b1;
 						h_sync_mode <= h_sync_mode + 1'd1;
 						h_sync_counter <= 11'd0;
+						v_sync_counter <= v_sync_counter;
 					end
 					else
 					begin
+						h_screen_on <= h_screen_on;
+						h_sync <= h_sync;
+						h_sync_mode <= h_sync_mode;
 						h_sync_counter <= h_sync_counter + 1'd1;
+						v_sync_counter <= v_sync_counter;
 					end
 				end
 		
@@ -77,12 +79,18 @@ module VGA_Controller (
 					if (h_sync_counter == 14'd950)
 					begin
 						h_screen_on <= 1'b1;
+						h_sync <= h_sync;
 						h_sync_mode <= h_sync_mode + 1'd1;
 						h_sync_counter <= 11'd0;
+						v_sync_counter <= v_sync_counter;
 					end
 					else
 					begin
+						h_screen_on <= h_screen_on;
+						h_sync <= h_sync;
+						h_sync_mode <= h_sync_mode;
 						h_sync_counter <= h_sync_counter + 1'd1;
+						v_sync_counter <= v_sync_counter;
 					end
 				end
 		
@@ -91,14 +99,20 @@ module VGA_Controller (
 				begin
 					if (h_sync_counter == 14'd12700)
 					begin
-						h_sync_mode <= h_sync_mode + 1'd1;
-						h_sync_counter <= 11'd0;
 						//Stop clocking pixels after end of display interval
 						h_screen_on <= 1'b0;
+						h_sync <= h_sync;
+						h_sync_mode <= h_sync_mode + 1'd1;
+						h_sync_counter <= 11'd0;
+						v_sync_counter <= v_sync_counter;
 					end
 					else
 					begin
+						h_screen_on <= h_screen_on;
+						h_sync <= h_sync;
+						h_sync_mode <= h_sync_mode;
 						h_sync_counter <= h_sync_counter + 1'd1;
+						v_sync_counter <= v_sync_counter;
 					end
 				end
 				
@@ -108,6 +122,7 @@ module VGA_Controller (
 				begin
 					if (h_sync_counter == 14'd300)
 					begin
+						h_screen_on <= h_screen_on;
 						h_sync <= 1'b0;
 						h_sync_mode <= 2'b00;
 						h_sync_counter <= 11'd0;
@@ -123,7 +138,11 @@ module VGA_Controller (
 					end
 					else
 					begin
+						h_screen_on <= h_screen_on;
+						h_sync <= h_sync;
+						h_sync_mode <= h_sync_mode;
 						h_sync_counter <= h_sync_counter + 1'd1;
+						v_sync_counter <= v_sync_counter;
 					end
 				end
 			endcase
@@ -145,21 +164,25 @@ module VGA_Controller (
 				10'd2:
 				begin
 					v_sync <= 1'b1;
+					v_screen_on <= v_screen_on;
 				end
 				//Wait Front Porch
 				10'd35:
 				begin
+					v_sync <= v_sync;
 					v_screen_on <= 1'b1;
 				end
 				//Wait Display Time
 				10'd515:
 				begin
+					v_sync <= v_sync;
 					v_screen_on <= 1'b0;
 				end
 				//Wait Back Porch
 				10'd525:
 				begin
 					v_sync <= 1'b0;
+					v_screen_on <= v_screen_on;
 				end
 				//maintain signal while lines are counting
 				default:
