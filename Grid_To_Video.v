@@ -69,11 +69,8 @@ module Grid_To_Video (
         if(reset)
         begin
             col_offset_counter <= 5'b0;
-            row_offset_counter <= 5'b0;
             current_column <= 10'b0;
-            current_row <= 10'b0;
             grid_col <= 5'b0;
-            grid_row <= 5'b0;
             pixel_rgb <= 8'b0;
         end
         else if(px_en)
@@ -90,6 +87,8 @@ module Grid_To_Video (
                     // only if we are less than 11 (block 12) this will get reset at a different point
                     if(grid_col < 5'd11)
                         grid_col <= grid_col + 5'd1;
+                    else
+                        grid_col <= grid_col;
 
                 end
                 // Otherwise just increment the col offset counter
@@ -125,7 +124,7 @@ module Grid_To_Video (
         begin
             current_row <= 10'b0;
             row_offset_counter <= 5'b0;
-            grid_row <=5'b0;
+            grid_row <= 5'b0;
         end
         else
         begin
@@ -148,6 +147,8 @@ module Grid_To_Video (
                     // Only if we are less than 19, otherwise, stay at 19 (block 20)
                     if(grid_row < 5'd19)
                         grid_row <= grid_row + 5'd1;
+                    else
+                        grid_row <= grid_row;
                 end
                 else
                 begin
