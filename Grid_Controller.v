@@ -32,7 +32,9 @@ module Grid_Controller (
 					s_input_2	= 5'd13, 
 					s_input_3	= 5'd14, 
 					s_input_4 	= 5'd15,
-					s_input_5 	= 5'd16;
+					s_input_5 	= 5'd16,
+					s_clear_0 	= 5'd17,
+					s_clear_1 	= 5'd18;
 
 	parameter [3:0] BTN_START 	= 4'b0100,
 					BTN_LEFT	= 4'b0111,
@@ -53,19 +55,24 @@ module Grid_Controller (
 					PLACE_AREA_START_ADDR = 240,
 					PLACE_AREA_END_ADDR = 251;
 
-	// parameter [24:0] SECOND_CLK_INTERVAL = 26'd50000000;
-	parameter [24:0] SECOND_CLK_INTERVAL = 26'd25; // Testing purposes
-	parameter 	THIS_MEM_OUT = 1'b0, 
-				PIECE_MEM_OUT = 1'b1;
+	parameter [24:0] SECOND_CLK_INTERVAL = 26'd50000000;
+	// parameter [24:0] SECOND_CLK_INTERVAL = 26'd25; // Testing purposes
+	parameter[1:0] 	THIS_MEM_OUT 	= 2'd0, 
+					PIECE_MEM_OUT 	= 2'd1,
+					LINE_MEM_OUT 	= 2'd2;
 
 	// Piece Placer Wires
 	wire piece_placed, piece_we;
 	wire [7:0] reg_1_addr, reg_2_addr, reg_3_addr, reg_4_addr;
 	wire [7:0] piece_addr, piece_grid_out;
 
-	reg piece_placer_enable, this_we, piece_will_collide;
-	reg mem_out_ctl, has_moved, move_right, move_left;
-	reg [1:0] piece_pos_idx;
+	// Line Clearer Wires
+	wire line_cleared, line_clear_we;
+	wire [7:0] line_clear_addr, line_clear_grid_out;
+
+	reg piece_placer_enable, line_clearer_enable, this_we, piece_will_collide;
+	reg has_moved, move_right, move_left;
+	reg [1:0] piece_pos_idx, mem_out_ctl;
 	reg [4:0] state = s_place_0;
 	reg [7:0] this_addr, this_grid_out;
 
@@ -81,7 +88,6 @@ module Grid_Controller (
 		.en(piece_placer_enable),
 		.clk(clk),
 		.rst(reset),
-		
 		.placed(piece_placed),
 		.we(piece_we),
 		.addr(piece_addr),
@@ -92,6 +98,16 @@ module Grid_Controller (
 		.reg_4_addr(reg_4_addr)	
 	);
 
+	Line_Clearer line_clearer(
+		.en(line_clearer_enable),
+		.clk(clk),
+		.rst(reset),
+		.data_in(tetris_grid_in),
+		.cleared(line_cleared),
+		.we(line_clear_we),
+		.addr(line_clear_addr),
+		.data_out(line_clear_grid_out)
+	);
 
 	// every other clk we send address, everyother clk we read data
 	always @(posedge clk)
@@ -148,7 +164,7 @@ module Grid_Controller (
 					if(piece_pos_idx == 2'd3)
 					begin
 						if(piece_will_collide)
-							state <= s_place_0; // TODO: Maybe should go to clear line state and check for end of game also
+							state <= s_clear_0;
 						else
 							state <= s_move_2;
 
@@ -207,8 +223,8 @@ module Grid_Controller (
 				end
 				s_move_8:
 				begin
-					state <= s_input_0; // TODO: Maybe should go to clear line state and wait for input
-					has_moved = 1'b1; // Not important for moving down, but is for left and right
+					state <= s_input_0; 
+					has_moved = 1'b1;
 				end
 
 				s_input_0:
@@ -268,6 +284,17 @@ module Grid_Controller (
 						piece_pos_idx <= piece_pos_idx + 2'b1;
 					end
 				end
+				s_clear_0:
+				begin
+					if(line_cleared == 1'b1)
+						state <= s_clear_1;
+					else
+						state <= s_clear_0;
+				end
+				s_clear_1:
+				begin
+					state <= s_place_0;
+				end
 
 				default:
 				begin
@@ -284,6 +311,7 @@ module Grid_Controller (
 		begin
 			mem_out_ctl = 1'b0;
 			piece_placer_enable = 1'b0;
+			line_clearer_enable = 1'b0;
 			piece_will_collide = 1'b0;
 			this_addr = 8'b0;
 			active_block_data = 8'b0;
@@ -462,6 +490,17 @@ module Grid_Controller (
 					end
 				end
 
+				s_clear_0:
+				begin
+					mem_out_ctl = LINE_MEM_OUT;
+					line_clearer_enable = 1'b1;
+				end
+				s_clear_1:
+				begin
+					mem_out_ctl = THIS_MEM_OUT;
+					line_clearer_enable = 1'b0;
+				end
+
 				default:
 				begin
 				end
@@ -470,19 +509,25 @@ module Grid_Controller (
 	end
 
 	// Multiplexor to choose the write enable signal going to memory
-	always @ (mem_out_ctl, this_we, this_addr, this_grid_out, piece_we, piece_addr, piece_grid_out)
+	always @ (mem_out_ctl, this_we, this_addr, this_grid_out, piece_we, piece_addr, piece_grid_out, line_clear_we, line_clear_addr, line_clear_grid_out)
 	begin
-		if(mem_out_ctl == THIS_MEM_OUT)
-		begin
-			write_en = this_we;
-			grid_address = this_addr;
-			grid_data_out = this_grid_out;
-		end
-		else // Choose piece_placer to output to memory
+		if(mem_out_ctl == PIECE_MEM_OUT) // Choose piece_placer to output to memory
 		begin
 			write_en = piece_we;
 			grid_address = piece_addr;
 			grid_data_out = piece_grid_out;
+		end
+		else if(mem_out_ctl == LINE_MEM_OUT)
+		begin
+			write_en = line_clear_we;
+			grid_address = line_clear_addr;
+			grid_data_out = line_clear_grid_out;
+		end
+		else
+		begin
+			write_en = this_we;
+			grid_address = this_addr;
+			grid_data_out = this_grid_out;
 		end
 	end
 
