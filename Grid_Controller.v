@@ -82,7 +82,7 @@ module Grid_Controller (
 	reg [7:0] active_block_data;
 	reg [24:0] tick_interval_counter;
 
-	integer i;
+	integer unsigned i;
 
 	Piece_Placer piece_placer(
 		.en(piece_placer_enable),
@@ -468,10 +468,10 @@ module Grid_Controller (
 					for(i = 0; i < GRID_END_ADDR; i = i + 12)
 					begin
 						// Check if moving the piece will result in a bad area
-						if(piece_next_pos[0] == i[7:0] || piece_next_pos[0] == ((i+11)[7:0])
-						|| piece_next_pos[1] == i[7:0] || piece_next_pos[1] == ((i+11)[7:0])
-						|| piece_next_pos[2] == i[7:0] || piece_next_pos[2] == ((i+11)[7:0])
-						|| piece_next_pos[3] == i[7:0] || piece_next_pos[3] == ((i+11)[7:0]))
+						if(piece_next_pos[0] == i[7:0] || piece_next_pos[0] == i[7:0]+11
+						|| piece_next_pos[1] == i[7:0] || piece_next_pos[1] == i[7:0]+11
+						|| piece_next_pos[2] == i[7:0] || piece_next_pos[2] == i[7:0]+11
+						|| piece_next_pos[3] == i[7:0] || piece_next_pos[3] == i[7:0]+11)
 						begin
 							piece_will_collide = 1'b1;
 						end
