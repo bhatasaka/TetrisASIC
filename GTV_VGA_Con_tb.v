@@ -57,8 +57,8 @@ module GTV_VGA_Conn_tb;
         .r_out(r_out),
         .g_out(g_out),
         .b_out(b_out),
-        .h_sync(v_sync),
-        .v_sync(h_sync),
+        .h_sync(h_sync),
+        .v_sync(v_sync),
         .pixel_en(px_en)
     );
 
@@ -85,7 +85,7 @@ module GTV_VGA_Conn_tb;
 	    $display("Done.");
 	end
 	
-	always@(posedge clock25)
+	always@(posedge grid_video_test.px_clk)
 	begin
 		if(px_en == 1'b1)
 		begin

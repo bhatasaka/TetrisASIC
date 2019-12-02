@@ -8,7 +8,7 @@ module VGA_Controller (
 	output [7:0] b_out,
 	output reg h_sync,
 	output reg v_sync,
-	output pixel_en
+	output wire pixel_en
 
 );
 
@@ -24,7 +24,6 @@ module VGA_Controller (
 	begin
 		h_sync = 1'b0;
 		v_sync = 1'b0;
-		pixel_en = 1'b0;
 		h_screen_on = 1'd0;
 		v_screen_on = 1'd0;
 		h_sync_counter = 14'd0;

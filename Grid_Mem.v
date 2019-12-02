@@ -14,7 +14,7 @@ module Grid_Mem
 	initial begin
 	for(i = 0; i < 256; i = i+1)	//Just initialize all with zeros
 		ram[i] = 8'b0;
-	$readmemb("/home/hatasaka/TetrisASIC/grid_mem.txt", ram);
+	// $readmemb("/home/hatasaka/TetrisASIC/grid_mem.txt", ram);
 	end
 
 	// Port A 
