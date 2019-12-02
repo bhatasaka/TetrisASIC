@@ -307,7 +307,7 @@ module Grid_Controller (
 	begin
 		if(reset)
 		begin
-			mem_out_ctl = 1'b0;
+			mem_out_ctl = THIS_MEM_OUT;
 			piece_placer_enable = 1'b0;
 			line_clearer_enable = 1'b0;
 			piece_will_collide = 1'b0;
@@ -323,6 +323,20 @@ module Grid_Controller (
 		end
 		else
 		begin
+			this_grid_out = 8'b0;
+			this_we = 1'b0;
+			this_addr = 8'b0;
+			mem_out_ctl = THIS_MEM_OUT;
+			piece_placer_enable = 1'b0;
+			line_clearer_enable = 1'b0;
+
+			for (i = 0; i < 12; i = i + 1)
+			begin
+				piece_pos[i] = piece_pos[i];
+				piece_next_pos[i] = piece_next_pos[i];
+			end
+			active_block_data = active_block_data;
+
 			case (state)
 				s_place_0:
 				begin
