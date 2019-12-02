@@ -11,7 +11,7 @@ module Tetris (
     reg reset;
     wire nes_reset, grid_we, pixel_en;
     wire [7:0] button_data, grid_address_a, grid_address_b, data_from_grid, data_to_grid, 
-               grid_to_converter, vga_to_converter, vga_address, pixel_rgb;
+               grid_to_converter, vga_to_converter, vga_address, pixel_rgb, vga_b_out;
     
     always @(posedge clk)
     begin
@@ -55,12 +55,12 @@ module Tetris (
 
     VGA_Mem vga_mem (
         .clk(clk),
-        .data_a(),
+        .data_a(8'd0),
         .addr_a(vga_address), 
-        .addr_b(),
-        .we_a(), 
+        .addr_b(8'd0),
+        .we_a(1'b0), 
         .q_a(vga_to_converter), 
-        .q_b()
+        .q_b(vga_b_out)
     );
 
     Grid_To_Video grid_to_video (
