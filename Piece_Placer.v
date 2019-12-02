@@ -52,7 +52,7 @@ begin
 		begin
     	for (i = 0; i < 12; i = i + 1)
       begin
-      	block[i] = 4'b0;
+      	block[i] <= 4'b0;
       end
     		
 			reg_1_addr <= 8'b0;
@@ -67,9 +67,17 @@ begin
    	 	    I:
    	 	    begin
    	 	       block[0]  <= I + 1; 
+   	 	       block[1]	 <= 8'b0;
+   	 	       block[2]	 <= 8'b0;
    	 	       block[3]  <= I + 1; 
+   	 	       block[4]	 <= 8'b0;
+   	 	       block[5]	 <= 8'b0;
    	 	       block[6]  <= I + 1; 
+   	 	       block[7]	 <= 8'b0;
+   	 	       block[8]	 <= 8'b0;
    	 	       block[9]  <= I + 1; 
+   	 	       block[10]	 <= 8'b0;
+   	 	       block[11]	 <= 8'b0;
    	 	       reg_1_addr <= NEXT_PIECE_BASE_ADDR + 0;
    	 	       reg_2_addr <= NEXT_PIECE_BASE_ADDR + 3;
    	 	       reg_3_addr <= NEXT_PIECE_BASE_ADDR + 6;
@@ -78,10 +86,18 @@ begin
    	 	    end
    	 	    O:
    	 	    begin
+   	 	       block[0]	 <= 8'b0;
+   	 	       block[1]	 <= 8'b0;
+   	 	       block[2]	 <= 8'b0;
+   	 	       block[3]	 <= 8'b0;
+   	 	       block[4]	 <= 8'b0;
+   	 	       block[5]	 <= 8'b0;
    	 	       block[6]  <= O + 1; 
    	 	       block[7]  <= O + 1; 
+   	 	       block[8]	 <= 8'b0;
    	 	       block[9]  <= O + 1; 
    	 	       block[10] <= O + 1; 
+   	 	       block[11]	 <= 8'b0;
    	 	       reg_1_addr <= NEXT_PIECE_BASE_ADDR + 6;
    	 	       reg_2_addr <= NEXT_PIECE_BASE_ADDR + 7;
    	 	       reg_3_addr <= NEXT_PIECE_BASE_ADDR + 9;
@@ -90,10 +106,18 @@ begin
    	 	    end
    	 	    T:
    	 	    begin
+   	 	       block[0]	 <= 8'b0;
+   	 	       block[1]	 <= 8'b0;
+   	 	       block[2]	 <= 8'b0;
+   	 	       block[3]	 <= 8'b0;
    	 	       block[4]  <= T + 1; 
+   	 	       block[5]	 <= 8'b0;
    	 	       block[6]  <= T + 1; 
    	 	       block[7]  <= T + 1; 
+   	 	       block[8]	 <= 8'b0;
+   	 	       block[9]	 <= 8'b0;
    	 	       block[10] <= T + 1; 
+   	 	       block[11] <= 8'b0;
    	 	       reg_1_addr <= NEXT_PIECE_BASE_ADDR + 4;
    	 	       reg_2_addr <= NEXT_PIECE_BASE_ADDR + 6;
    	 	       reg_3_addr <= NEXT_PIECE_BASE_ADDR + 7;
@@ -102,10 +126,18 @@ begin
    	 	    end
    	 	    S:
    	 	    begin
+   	 	       block[0]	 <= 8'b0;
+   	 	       block[1]	 <= 8'b0;
+   	 	       block[2]	 <= 8'b0;
+   	 	       block[3]	 <= 8'b0;
+   	 	       block[4]	 <= 8'b0;
+   	 	       block[5]	 <= 8'b0;
+   	 	       block[6]	 <= 8'b0;
    	 	       block[7]  <= S + 1; 
    	 	       block[8]  <= S + 1; 
    	 	       block[9]  <= S + 1; 
    	 	       block[10] <= S + 1; 
+   	 	       block[11]	 <= 8'b0;
    	 	       reg_1_addr <= NEXT_PIECE_BASE_ADDR + 7;
    	 	       reg_2_addr <= NEXT_PIECE_BASE_ADDR + 8;
    	 	       reg_3_addr <= NEXT_PIECE_BASE_ADDR + 9;
@@ -114,8 +146,16 @@ begin
    	 	    end
    	 	    Z:
    	 	    begin
+   	 	       block[0]	 <= 8'b0;
+   	 	       block[1]	 <= 8'b0;
+   	 	       block[2]	 <= 8'b0;
+   	 	       block[3]	 <= 8'b0;
+   	 	       block[4]	 <= 8'b0;
+   	 	       block[5]	 <= 8'b0;
    	 	       block[6]  <= Z + 1; 
    	 	       block[7]  <= Z + 1; 
+   	 	       block[8]	 <= 8'b0;
+   	 	       block[9]	 <= 8'b0;
    	 	       block[10] <= Z + 1; 
    	 	       block[11] <= Z + 1; 
    	 	       reg_1_addr <= NEXT_PIECE_BASE_ADDR + 6;
@@ -126,10 +166,18 @@ begin
    	 	    end
    	 	    J:
    	 	    begin
+   	 	       block[0]	 <= 8'b0;
+   	 	       block[1]	 <= 8'b0;
+   	 	       block[2]	 <= 8'b0;
+   	 	       block[3]	 <= 8'b0;
    	 	       block[4]  <= J + 1; 
+   	 	       block[5]	 <= 8'b0;
+   	 	       block[6]	 <= 8'b0;
    	 	       block[7]  <= J + 1; 
+   	 	       block[8]	 <= 8'b0;
    	 	       block[9]  <= J + 1; 
    	 	       block[10] <= J + 1; 
+   	 	       block[11]	 <= 8'b0;
    	 	       reg_1_addr <= NEXT_PIECE_BASE_ADDR + 4;
    	 	       reg_2_addr <= NEXT_PIECE_BASE_ADDR + 7;
    	 	       reg_3_addr <= NEXT_PIECE_BASE_ADDR + 9;
@@ -138,10 +186,18 @@ begin
    	 	    end
    	 	    L:
    	 	    begin
+   	 	       block[0]	 <= 8'b0;
+   	 	       block[1]	 <= 8'b0;
+   	 	       block[2]	 <= 8'b0;
    	 	       block[3]  <= L + 1; 
+   	 	       block[4]	 <= 8'b0;
+   	 	       block[5]	 <= 8'b0;
    	 	       block[6]  <= L + 1; 
+   	 	       block[7]	 <= 8'b0;
+   	 	       block[8]	 <= 8'b0;
    	 	       block[9]  <= L + 1; 
    	 	       block[10] <= L + 1; 
+   	 	       block[11]	 <= 8'b0;
    	 	       reg_1_addr <= NEXT_PIECE_BASE_ADDR + 3;
    	 	       reg_2_addr <= NEXT_PIECE_BASE_ADDR + 6;
    	 	       reg_3_addr <= NEXT_PIECE_BASE_ADDR + 9;
@@ -150,12 +206,46 @@ begin
    	 	    end
    	 	    default:    //THIS JUST PLACES AN AIR BLOCK
    	 	    begin
+   	 	       block[0]	 <= 8'b0;
+   	 	       block[1]	 <= 8'b0;
+   	 	       block[2]	 <= 8'b0;
+   	 	       block[3]	 <= 8'b0;
+   	 	       block[4]	 <= 8'b0;
+   	 	       block[5]	 <= 8'b0;
+   	 	       block[6]	 <= 8'b0;
+   	 	       block[7]	 <= 8'b0;
+   	 	       block[8]	 <= 8'b0;
+   	 	       block[9]	 <= 8'b0;
+   	 	       block[10]	 <= 8'b0;
+   	 	       block[11]	 <= 8'b0;
+   	 	       reg_1_addr <= 8'b0;
+   	 	       reg_2_addr <= 8'b0;
+   	 	       reg_3_addr <= 8'b0;
+   	 	       reg_4_addr <= 8'b0;
    	 	       piece_gen <= 1'b0;
    	 	    end
 			endcase
 		end
 		else
-			piece_gen <= 1'b1;
+		begin
+   		block[0]	 <= block[0];
+   		block[1]	 <= block[1];
+   		block[2]	 <= block[2];
+   		block[3]	 <= block[3];
+   		block[4]	 <= block[4];
+   		block[5]	 <= block[5];
+   		block[6]	 <= block[6];
+   		block[7]	 <= block[7];
+   		block[8]	 <= block[8];
+   		block[9]	 <= block[9];
+   		block[10]	 <= block[10];
+   		block[11]	 <= block[11];
+   	 	reg_1_addr <= reg_1_addr;
+   	 	reg_2_addr <= reg_2_addr;
+   	 	reg_3_addr <= reg_3_addr;
+   	 	reg_4_addr <= reg_4_addr;
+			piece_gen <= piece_gen;
+		end
 end
 
 //Write the generated piece from local storage into 
@@ -264,16 +354,26 @@ begin
                 12: //Not an actual box, just a dummy state to reset signals and the state machine
                 begin
                     we <= 1'b0; 
+                    data <= 8'b0;
                     box_number <= 4'd0;
                     placed <= 1'b1;
                 end
                 default:
                 begin
                     we <= 1'b0; 
+                    data <= 8'b0;
                     box_number <= 4'd0;
                     placed <= 1'b0;
                 end
             endcase
+        end
+        else
+        begin
+        	addr <= addr;
+        	we <= we;
+        	data <= data;
+        	box_number <= box_number;
+        	placed <= placed;
         end
     end
 end
