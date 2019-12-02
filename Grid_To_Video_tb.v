@@ -31,6 +31,7 @@ module Grid_To_Video_tb;
 		.addr_b(grid_addr_b),
 		.we_a(grid_we),
 		.clk(clock),
+		.reset(1'b0),
 		.q_a(grid_out_a),
 		.q_b(grid_out_b)
     );

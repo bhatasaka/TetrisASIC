@@ -19,21 +19,20 @@ module Grid_To_Video (
 
     reg px_clk;
     reg[4:0] col_offset_counter, row_offset_counter, grid_col, grid_row;
-    reg[7:0] current_px_rgb, next_px_rgb;
     reg[9:0] current_row, current_column;
 
     parameter IDLE = 1'b0;
     parameter SET_PX_ADDR = 1'b1;
 
-    parameter AIR =     16'b0;
-    parameter I_PIECE = 16'd1;
-    parameter O_PIECE = 16'd2;
-    parameter T_PIECE = 16'd3;
-    parameter S_PIECE = 16'd4;
-    parameter Z_PIECE = 16'd5;
-    parameter J_PIECE = 16'd6;
-    parameter L_PIECE = 16'd7;
-    parameter BORDER =  16'd8;
+    parameter AIR =     4'b0;
+    parameter I_PIECE = 4'd1;
+    parameter O_PIECE = 4'd2;
+    parameter T_PIECE = 4'd3;
+    parameter S_PIECE = 4'd4;
+    parameter Z_PIECE = 4'd5;
+    parameter J_PIECE = 4'd6;
+    parameter L_PIECE = 4'd7;
+    parameter BORDER =  4'd8;
 
     parameter AIR_ADDR =    16'b0;
     parameter I_PIECE_ADDR =      16'd576;
@@ -51,7 +50,7 @@ module Grid_To_Video (
     // Combinational logic to determine the vga_address
     always @ (grid_data)
     begin
-        case (grid_data & 8'h0F) // Mask out the upper bits
+        case (grid_data[3:0]) // Mask out the upper bits
             AIR:     vga_addr = row_offset_counter * 24 + col_offset_counter + AIR_ADDR;
             I_PIECE: vga_addr = row_offset_counter * 24 + col_offset_counter + I_PIECE_ADDR;
             O_PIECE: vga_addr = row_offset_counter * 24 + col_offset_counter + O_PIECE_ADDR;
@@ -75,6 +74,7 @@ module Grid_To_Video (
             current_row <= 10'b0;
             grid_col <= 5'b0;
             grid_row <= 5'b0;
+            pixel_rgb <= 8'b0;
         end
         else if(px_en)
         begin
@@ -112,6 +112,7 @@ module Grid_To_Video (
         else if(px_en == 1'b0)
         begin
             // If px_en isn't high, then we will just reset the current column to 0
+            pixel_rgb <= 8'b0;
             current_column <= 10'b0;
             grid_col <= 5'b0;
             col_offset_counter <= 5'b0;

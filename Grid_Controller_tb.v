@@ -2,7 +2,7 @@
 // This testbench is set up so the Grid_Controller has a tick time of 25 clock cycles
 // (instead of 50 million for 1 second)
 
-module Grid_To_Video_tb;
+module Grid_Controller_tb;
 	reg clock, reset, test_write_mem;
     reg [3:0] controller_in;
     reg grid_we;

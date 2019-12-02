@@ -1,7 +1,7 @@
 `timescale 1ns / 1ps
 
-module Grid_To_Video_tb;
-	reg clock, reset, grid_we;
+module GTV_VGA_Conn_tb;
+	reg clock, reset, grid_we, clock25;
 	reg[7:0] grid_addr_a, grid_data_in;
 	reg[15:0] vga_addr_b;
     wire px_en, v_sync, h_sync;
@@ -16,6 +16,7 @@ module Grid_To_Video_tb;
 	parameter HALF_CLK = 10;
 	
 	integer i = 0;
+	integer dumpfile;
 
 	VGA_Mem vga_mem_test (
 		.data_a(8'b0),
@@ -33,6 +34,7 @@ module Grid_To_Video_tb;
 		.addr_b(grid_addr_b),
 		.we_a(grid_we),
 		.clk(clock),
+		.reset(1'b0),
 		.q_a(grid_out_a),
 		.q_b(grid_out_b)
     );
@@ -50,6 +52,7 @@ module Grid_To_Video_tb;
 
     VGA_Controller vga_test (
         .clk(clock),
+		.rst(reset),
         .rgb_8(pixel_rgb),
         .r_out(r_out),
         .g_out(g_out),
@@ -63,44 +66,47 @@ module Grid_To_Video_tb;
 	
         // px_en = 1'b0;
         clock = 1'b0;
+		clock25 = 1'b0;
         reset = 1'b1;
 		grid_we = 1'b0;
 		grid_data_in = 8'b0;
 		grid_addr_a = 8'b0;
 		vga_addr_b = 16'b0;
-
+		i = 0;
+		dumpfile = $fopen("/home/hatasaka/TetrisASIC/vga_dump.csv", "w");
 
 	    #FULL_CLK
 
         reset = 1'b0;
-        // px_en = 1'b0;
+        // Going to assume that the grid memory is loaded with some data right now
+		// from a file (check Grid_Mem.v for the readmemb statement)
+
 		
-		// Write some data to grid_mem
-		grid_data_in = 8'b0000_0001;
-		grid_addr_a = 8'b0000_0001;
-		grid_we = 1'b1;
-		#FULL_CLK;
-
-		grid_data_in = 8'b0000_0001;
-		grid_addr_a = 8'b0000_0001;
-		#FULL_CLK;
-		grid_we = 1'b0;
-		// px_en = 1'b1;
-
-		// for(i = 0; i < 25; i = i + 1)
-		// begin
-		// 	#25400; // Wait 25.4 microseconds
-		// 	px_en = 1'b0;
-		// 	#300; // Wait 300ns
-		// 	px_en = 1'b1;
-		// end
-
 	    $display("Done.");
 	end
 	
+	always@(posedge clock25)
+	begin
+		if(px_en == 1'b1)
+		begin
+			$fwrite(dumpfile, "%d,", pixel_rgb);
+			if(i % 11 == 0)
+			begin
+				$fwrite(dumpfile, "\n");
+				i = 0;
+			end
+			else
+				i = i+1;
+		end
+	end
+
 	always@(*)
 	begin
 		#HALF_CLK clock <= ~clock;
+	end
+	always@(*)
+	begin
+		#FULL_CLK clock25 <= ~clock25;
 	end
 	
 endmodule
