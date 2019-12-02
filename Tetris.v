@@ -59,7 +59,7 @@ module Tetris (
         .clk(clk),
         .data_a(8'd0),
         .addr_a(vga_address), 
-        .addr_b(8'd0),
+        .addr_b(16'd0),
         .we_a(1'b0), 
         .q_a(vga_to_converter), 
         .q_b(vga_b_out)
