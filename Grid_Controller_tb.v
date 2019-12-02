@@ -1,21 +1,21 @@
 `timescale 1ns / 1ps
+// This testbench is set up so the Grid_Controller has a tick time of 25 clock cycles
+// (instead of 50 million for 1 second)
 
 module Grid_To_Video_tb;
-	reg clock, reset;
+	reg clock, reset, test_write_mem;
     reg [3:0] controller_in;
-    wire grid_we;
-	wire [7:0] vga_out_a, grid_out_a, grid_addr_b, grid_out_b, grid_addr_a, grid_data_in;
-	// reg[15:0] vga_addr_b;
-    // wire px_en, v_sync, h_sync;
-	// wire [7:0] vga_out_b, pixel_rgb;
-	// wire [7:0] r_out, g_out, b_out;
-    // wire [15:0] vga_addr_a;
-	// reg [7:0] data_a;
-	// reg [15:0] addr_a;
+    reg grid_we;
+	reg [7:0] grid_addr_b,grid_addr_a, grid_data_in;
+    reg [7:0] test_grid_addr, test_grid_data, test_grid_we;
+    wire gc_we;
+    wire [7:0] grid_out_a, grid_out_b, gc_addr_a, gc_grid_data;
 
 	parameter FULL_CLK = 20;
 	parameter HALF_CLK = 10;
-	
+	parameter [3:0] BTN_START 	= 4'b0100,
+					BTN_LEFT	= 4'b0111,
+					BTN_RIGHT	= 4'b1000;
 	integer i = 0;
 
 	Grid_Controller grid_controller_test (
@@ -23,9 +23,9 @@ module Grid_To_Video_tb;
 		.reset(reset),
 		.controller_in(controller_in),
         .tetris_grid_in(grid_out_a),
-        .grid_address(grid_addr_a),
-		.grid_data_out(grid_data_in),
-		.write_en(grid_we)
+        .grid_address(gc_addr_a),
+		.grid_data_out(gc_grid_data),
+		.write_en(gc_we)
 	);
 
     Grid_Mem grid_mem_test (
@@ -34,7 +34,7 @@ module Grid_To_Video_tb;
 		.addr_b(grid_addr_b),
 		.we_a(grid_we),
 		.clk(clock),
-        .reset(reset),
+        .reset(1'b0),
 		.q_a(grid_out_a),
 		.q_b(grid_out_b)
     );
@@ -42,13 +42,80 @@ module Grid_To_Video_tb;
         clock = 1'b0;
         reset = 1'b1;
         controller_in = 4'b0;
+        grid_addr_b = 8'b0;
+        test_write_mem = 1'b1;
+        test_grid_addr = 8'b0;
+        test_grid_data = 8'b0;
+        test_grid_we = 1'b0;
 
 	    #FULL_CLK;
-
         reset = 1'b0;
+        test_grid_we = 1'b1;
+        // test_grid_addr = 8'd64; // Put a block at address 64 to collide when moving down in the grid memory
+        // test_grid_addr = 8'd52; // Put a block at address 52 to collide when moving left in the grid memory
+        test_grid_addr = 8'd255; // Put a block at address 255 to collide with nothing
+        test_grid_data = 8'b0000_0001;
 
         #FULL_CLK;
-        #4200; // Wait quite a few clock cycles for the game ticker clock to trigger
+        test_grid_we = 1'b0;
+        test_write_mem = 1'b0;
+        reset = 1'b1;
+
+        #FULL_CLK;
+        reset = 1'b0;
+        #FULL_CLK;
+        #(130 * FULL_CLK); // Wait 130 clock cycles before input is added so that the piece is in the game area
+        controller_in = BTN_LEFT;
+        #(35 *FULL_CLK); // Wait 35 clock cycles to push the button again
+        controller_in = 4'b0;
+
+        #(2 *FULL_CLK);
+        controller_in = BTN_LEFT;
+        #(35 *FULL_CLK);
+        controller_in = 4'b0;
+        #(2 *FULL_CLK);
+        controller_in = BTN_LEFT;
+        #(35 *FULL_CLK);
+        controller_in = 4'b0;
+        #(2 *FULL_CLK);
+        controller_in = BTN_LEFT;
+        #(35 *FULL_CLK);
+        controller_in = 4'b0;
+        #(2 *FULL_CLK);
+        controller_in = BTN_LEFT; 
+        #(35 *FULL_CLK);
+        controller_in = 4'b0;
+        #(2 *FULL_CLK);
+        controller_in = BTN_LEFT; 
+        #(35 *FULL_CLK);
+        controller_in = 4'b0;
+        #(2 *FULL_CLK);
+        controller_in = BTN_LEFT;
+        #(35 *FULL_CLK);
+        controller_in = 4'b0;
+        #(2 *FULL_CLK);
+        controller_in = BTN_LEFT; 
+        #(35 *FULL_CLK);
+        controller_in = 4'b0;
+        #(2 *FULL_CLK);
+        controller_in = BTN_LEFT; // This one should get denied
+        #(35 *FULL_CLK);
+        controller_in = 4'b0;
+        #(2 *FULL_CLK);
+        controller_in = BTN_LEFT; // This one should get denied
+        #(35 *FULL_CLK);
+        controller_in = 4'b0;
+        #(2 *FULL_CLK);
+        controller_in = BTN_LEFT; // This one should get denied
+        #(35 *FULL_CLK);
+        controller_in = 4'b0;
+        #(2 *FULL_CLK);
+        controller_in = BTN_LEFT; // This one should get denied
+        #(35 *FULL_CLK);
+        controller_in = 4'b0;
+
+        #2000;
+
 
 	    $display("Done.");
 	end
@@ -57,5 +124,22 @@ module Grid_To_Video_tb;
 	begin
 		#HALF_CLK clock <= ~clock;
 	end
+
+    always @(test_write_mem, test_grid_addr, test_grid_data, test_grid_we, gc_addr_a, gc_grid_data, gc_we)
+    begin
+        if(test_write_mem == 1'b1)
+        begin
+            grid_addr_a = test_grid_addr;
+            grid_data_in = test_grid_data;
+            grid_we = test_grid_we;
+        end
+        else
+        begin
+            grid_addr_a = gc_addr_a;
+            grid_data_in = gc_grid_data;
+            grid_we = gc_we;
+        end
+
+    end
 	
 endmodule
