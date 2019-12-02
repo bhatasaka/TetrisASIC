@@ -2,16 +2,19 @@ module Tetris (
     input clk,
     input hard_reset,
     input nes_in,
-    output reg [7:0] r_out,
-	output reg [7:0] g_out,
-	output reg [7:0] b_out,
-	output reg h_sync,
-	output reg v_sync
+    output wire [7:0] r_out,
+	output wire [7:0] g_out,
+	output wire [7:0] b_out,
+	output wire h_sync,
+	output wire v_sync
 );
     reg reset;
     wire nes_reset, grid_we, pixel_en;
-    wire [7:0] button_data, grid_address_a, grid_address_b, data_from_grid, data_to_grid, 
+    wire [3:0] button_data;
+    wire [7:0] grid_address_a, grid_address_b, data_from_grid, data_to_grid, 
                grid_to_converter, vga_to_converter, vga_address, pixel_rgb, vga_b_out;
+
+
     
     always @(posedge clk)
     begin

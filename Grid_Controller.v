@@ -114,8 +114,6 @@ module Grid_Controller (
 	begin
 		if (reset)
 		begin
-			this_grid_out <= 8'd0;
-			grid_address <= 8'd0;
 			state <= s_place_0;
 			tick_interval_counter <= 25'b0;
 			piece_pos_idx <= 2'b0;
@@ -446,10 +444,10 @@ module Grid_Controller (
 				end
 				s_input_2: // Move right, get next addresses, don't worry about overflow, or edges yet
 				begin
-					piece_next_pos[0] = piece_pos[0] - 1;
-					piece_next_pos[1] = piece_pos[1] - 1;
-					piece_next_pos[2] = piece_pos[2] - 1;
-					piece_next_pos[3] = piece_pos[3] - 1;
+					piece_next_pos[0] = piece_pos[0] + 8'd255;
+					piece_next_pos[1] = piece_pos[1] + 8'd255;
+					piece_next_pos[2] = piece_pos[2] + 8'd255;
+					piece_next_pos[3] = piece_pos[3] + 8'd255;
 				end
 				s_input_3:
 				begin
