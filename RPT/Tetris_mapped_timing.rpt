@@ -1,0 +1,126 @@
+ 
+****************************************
+Report : timing
+        -path full
+        -delay max
+        -max_paths 1
+Design : Tetris
+Version: K-2015.06-SP5-6
+Date   : Mon Dec  2 01:28:53 2019
+****************************************
+
+ # A fanout number of 1000 was used for high fanout net computations.
+
+Operating Conditions: PVT_1P8V_25C   Library: sclib_tsmc180_ss
+Wire Load Model Mode: top
+
+  Startpoint: reset_reg (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: grid_mem/q_a_reg[2]
+            (rising edge-triggered flip-flop clocked by clk)
+  Path Group: clk
+  Path Type: max
+
+  Point                                                   Incr       Path
+  --------------------------------------------------------------------------
+  clock clk (rise edge)                                   0.00       0.00
+  clock network delay (ideal)                             0.00       0.00
+  reset_reg/CLK (DFFQX1)                                  0.00 #     0.00 r
+  reset_reg/Q (DFFQX1)                                    0.18       0.18 f
+  grid_controller/reset (Grid_Controller)                 0.00       0.18 f
+  grid_controller/U35/Z (INVX2)                           0.53       0.72 r
+  grid_controller/U81/Z (INVX2)                           0.69       1.41 f
+  grid_controller/U88/Z (NOR2X1)                          0.67       2.07 r
+  grid_controller/U161/Z (NAND2X1)                        0.07       2.15 f
+  grid_controller/U164/Z (NAND2X1)                        0.15       2.30 r
+  grid_controller/U21/Z (INVX1)                           0.14       2.44 f
+  grid_controller/U217/Z (NAND2X1)                        0.09       2.53 r
+  grid_controller/U219/Z (NAND3X1)                        0.05       2.58 f
+  grid_controller/U220/Z (AND2X1)                         0.14       2.72 f
+  grid_controller/U223/Z (MUX2X1)                         0.20       2.93 f
+  grid_controller/U224/Z (NAND2X1)                        0.06       2.99 r
+  grid_controller/U225/Z (NAND3X1)                        0.18       3.17 f
+  grid_controller/U228/Z (NAND2X1)                        0.13       3.30 r
+  grid_controller/U229/Z (NAND2X1)                        0.06       3.35 f
+  grid_controller/U231/Z (NOR2X1)                         0.12       3.48 r
+  grid_controller/U236/Z (NOR2X1)                         0.08       3.55 f
+  grid_controller/U237/Z (NOR2X1)                         0.10       3.65 r
+  grid_controller/U55/Z (INVX1)                           0.12       3.78 f
+  grid_controller/U702/Z (NAND3X1)                        0.20       3.97 r
+  grid_controller/U705/Z (AND2X1)                         0.10       4.08 r
+  grid_controller/U707/Z (NAND3X1)                        0.05       4.13 f
+  grid_controller/U226/Z (INVX1)                          0.07       4.20 r
+  grid_controller/U240/Z (NOR2X1)                         0.09       4.29 f
+  grid_controller/U241/Z (NOR2X1)                         0.09       4.38 r
+  grid_controller/U242/Z (NOR2X1)                         0.08       4.46 f
+  grid_controller/U243/Z (NAND3X1)                        0.07       4.53 r
+  grid_controller/U244/Z (NAND2X1)                        0.08       4.61 f
+  grid_controller/U16/Z (INVX1)                           0.11       4.72 r
+  grid_controller/U511/Z (NAND2X1)                        0.06       4.78 f
+  grid_controller/U515/Z (NAND3X1)                        0.27       5.05 r
+  grid_controller/U516/Z (NAND2X1)                        0.07       5.12 f
+  grid_controller/U519/Z (NAND3X1)                        0.20       5.32 r
+  grid_controller/U831/Z (NAND2X1)                        0.07       5.39 f
+  grid_controller/U836/Z (NAND3X1)                        0.21       5.60 r
+  grid_controller/U925/Z (NAND3X1)                        0.11       5.71 f
+  grid_controller/U926/Z (NAND3X1)                        0.11       5.83 r
+  grid_controller/U464/Z (NAND2X1)                        0.13       5.96 f
+  grid_controller/U372/Z (NAND2X1)                        0.17       6.13 r
+  grid_controller/U436/Z (NOR2X1)                         0.11       6.24 f
+  grid_controller/U437/Z (NOR2X1)                         0.07       6.31 r
+  grid_controller/U438/Z (NOR2X1)                         0.13       6.44 f
+  grid_controller/U441/Z (MUX2X1)                         0.25       6.69 f
+  grid_controller/U442/Z (NAND2X1)                        0.06       6.75 r
+  grid_controller/U443/Z (NAND3X1)                        0.17       6.92 f
+  grid_controller/U446/Z (NAND2X1)                        0.10       7.02 r
+  grid_controller/U447/Z (NAND2X1)                        0.05       7.08 f
+  grid_controller/U448/Z (NAND2X1)                        0.06       7.13 r
+  grid_controller/U450/Z (NAND2X1)                        0.13       7.26 f
+  grid_controller/U28/Z (INVX1)                           0.13       7.39 r
+  grid_controller/U463/Z (NOR2X1)                         0.12       7.51 f
+  grid_controller/U477/Z (NOR2X1)                         0.08       7.58 r
+  grid_controller/U480/Z (NOR2X1)                         0.09       7.67 f
+  grid_controller/U482/Z (MUX2X1)                         0.20       7.87 f
+  grid_controller/U485/Z (NAND3X1)                        0.14       8.02 r
+  grid_controller/U551/Z (NAND2X1)                        0.07       8.08 f
+  grid_controller/U555/Z (NAND3X1)                        0.29       8.37 r
+  grid_controller/U556/Z (NAND2X1)                        0.07       8.45 f
+  grid_controller/U560/Z (NAND3X1)                        0.19       8.63 r
+  grid_controller/U575/Z (NAND2X1)                        0.07       8.71 f
+  grid_controller/U580/Z (NAND3X1)                        0.19       8.89 r
+  grid_controller/U1114/Z (NAND2X1)                       0.07       8.96 f
+  grid_controller/U1121/Z (NAND3X1)                       0.08       9.04 r
+  grid_controller/U1122/Z (NAND2X1)                       0.06       9.10 f
+  grid_controller/U1126/Z (NAND3X1)                       0.21       9.31 r
+  grid_controller/grid_address[5] (Grid_Controller)       0.00       9.31 r
+  grid_mem/addr_a[5] (Grid_Mem)                           0.00       9.31 r
+  grid_mem/U11/Z (INVX1)                                  0.16       9.48 f
+  grid_mem/U49/Z (NAND3X1)                                0.29       9.77 r
+  grid_mem/U213/Z (NOR2X1)                                0.48      10.25 f
+  grid_mem/U2478/Z (NAND2X1)                              0.21      10.47 r
+  grid_mem/U2481/Z (NAND3X1)                              0.06      10.53 f
+  grid_mem/U2486/Z (NOR2X1)                               0.08      10.61 r
+  grid_mem/U2489/Z (NAND3X1)                              0.05      10.66 f
+  grid_mem/U2502/Z (NOR2X1)                               0.08      10.74 r
+  grid_mem/U2503/Z (NAND3X1)                              0.07      10.81 f
+  grid_mem/U2504/Z (NOR2X1)                               0.06      10.87 r
+  grid_mem/U2506/Z (NAND3X1)                              0.06      10.93 f
+  grid_mem/U2609/Z (MUX2X1)                               0.19      11.12 f
+  grid_mem/U2610/Z (NAND2X1)                              0.06      11.18 r
+  grid_mem/U2611/Z (NAND2X1)                              0.05      11.24 f
+  grid_mem/U2612/Z (MUX2X1)                               0.21      11.45 f
+  grid_mem/q_a_reg[2]/D (DFFQX1)                          0.00      11.45 f
+  data arrival time                                                 11.45
+
+  clock clk (rise edge)                                  20.00      20.00
+  clock network delay (ideal)                             0.00      20.00
+  grid_mem/q_a_reg[2]/CLK (DFFQX1)                        0.00      20.00 r
+  library setup time                                     -0.11      19.89
+  data required time                                                19.89
+  --------------------------------------------------------------------------
+  data required time                                                19.89
+  data arrival time                                                -11.45
+  --------------------------------------------------------------------------
+  slack (MET)                                                        8.44
+
+
+1
