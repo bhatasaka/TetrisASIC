@@ -307,7 +307,7 @@ module Grid_Controller (
 	begin
 		if(reset)
 		begin
-			mem_out_ctl = 1'b0;
+			mem_out_ctl = THIS_MEM_OUT;
 			piece_placer_enable = 1'b0;
 			line_clearer_enable = 1'b0;
 			piece_will_collide = 1'b0;
@@ -323,6 +323,20 @@ module Grid_Controller (
 		end
 		else
 		begin
+			this_grid_out = 8'b0;
+			this_we = 1'b0;
+			this_addr = 8'b0;
+			mem_out_ctl = THIS_MEM_OUT;
+			piece_placer_enable = 1'b0;
+			line_clearer_enable = 1'b0;
+
+			for (i = 0; i < 12; i = i + 1)
+			begin
+				piece_pos[i] = piece_pos[i];
+				piece_next_pos[i] = piece_next_pos[i];
+			end
+			active_block_data = active_block_data;
+
 			case (state)
 				s_place_0:
 				begin
@@ -444,20 +458,20 @@ module Grid_Controller (
 				end
 				s_input_2: // Move right, get next addresses, don't worry about overflow, or edges yet
 				begin
-					piece_next_pos[0] = piece_pos[0] + 8'd255;
-					piece_next_pos[1] = piece_pos[1] + 8'd255;
-					piece_next_pos[2] = piece_pos[2] + 8'd255;
-					piece_next_pos[3] = piece_pos[3] + 8'd255;
+					piece_next_pos[0] = piece_pos[0] - 8'd1;
+					piece_next_pos[1] = piece_pos[1] - 8'd1;
+					piece_next_pos[2] = piece_pos[2] - 8'd1;
+					piece_next_pos[3] = piece_pos[3] - 8'd1;
 				end
 				s_input_3:
 				begin
 					for(i = 0; i < GRID_END_ADDR; i = i + 12)
 					begin
 						// Check if moving the piece will result in a bad area
-						if(piece_next_pos[0] == i || piece_next_pos[0] == i+11
-						|| piece_next_pos[1] == i || piece_next_pos[1] == i+11
-						|| piece_next_pos[2] == i || piece_next_pos[2] == i+11
-						|| piece_next_pos[3] == i || piece_next_pos[3] == i+11)
+						if(piece_next_pos[0] == i[7:0] || piece_next_pos[0] == ((i+11)[7:0])
+						|| piece_next_pos[1] == i[7:0] || piece_next_pos[1] == ((i+11)[7:0])
+						|| piece_next_pos[2] == i[7:0] || piece_next_pos[2] == ((i+11)[7:0])
+						|| piece_next_pos[3] == i[7:0] || piece_next_pos[3] == ((i+11)[7:0]))
 						begin
 							piece_will_collide = 1'b1;
 						end
