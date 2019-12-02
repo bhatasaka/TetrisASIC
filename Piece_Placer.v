@@ -24,17 +24,6 @@ wire lf;
 
 integer i;
 
-// initial
-// begin
-// 	for (i = 0; i < 12; i = i + 1)
-// 	begin
-// 		block[i] = 4'b0;
-// 	end
-// 	lfsr = 3'b1;
-// 	box_number = 4'b0;
-// 	piece_gen = 1'b0;
-// end
-
 //LFSR Polynomial
 assign lf = (lfsr[3] ^ lfsr[2] ^ lfsr[0]);
 
@@ -44,7 +33,14 @@ assign lf = (lfsr[3] ^ lfsr[2] ^ lfsr[0]);
 //state (potentially from previous game)
 always @(posedge clk)
 begin
-	lfsr <= {lf, lfsr[3], lfsr[2], lfsr[1]};
+	if (rst == 1'b1)
+	begin
+		lfsr <= 4'd1;
+	end
+	else
+	begin
+		lfsr <= {lf, lfsr[3], lfsr[2], lfsr[1]};
+	end
 end
 
 //Write random block into local memory and indicate
