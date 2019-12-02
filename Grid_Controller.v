@@ -336,6 +336,7 @@ module Grid_Controller (
 				piece_next_pos[i] = piece_next_pos[i];
 			end
 			active_block_data = active_block_data;
+			piece_will_collide = piece_will_collide;
 
 			case (state)
 				s_place_0:
