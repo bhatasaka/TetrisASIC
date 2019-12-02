@@ -19,18 +19,18 @@ module VGA_Controller (
 	reg [1:0] v_sync_mode;
 	reg [9:0] v_sync_counter;
 	
-	//For Simulation
-	initial
-	begin
-		h_sync = 1'b0;
-		v_sync = 1'b0;
-		h_screen_on = 1'd0;
-		v_screen_on = 1'd0;
-		h_sync_counter = 14'd0;
-		v_sync_counter = 10'd0;
-		h_sync_mode = 2'd0;
-		v_sync_mode = 2'd0;
-	end
+	// //For Simulation
+	// initial
+	// begin
+	// 	h_sync = 1'b0;
+	// 	v_sync = 1'b0;
+	// 	h_screen_on = 1'd0;
+	// 	v_screen_on = 1'd0;
+	// 	h_sync_counter = 14'd0;
+	// 	v_sync_counter = 10'd0;
+	// 	h_sync_mode = 2'd0;
+	// 	v_sync_mode = 2'd0;
+	// end
 	
 	//enable pixel input
 	assign pixel_en = h_screen_on & v_screen_on;
@@ -131,7 +131,7 @@ module VGA_Controller (
 	end
 	
 	//Vertical sync signal
-	always @(posedge clk or v_sync_counter)
+	always @(posedge clk)
 	begin
 		if (rst == 1'b1)
 		begin

@@ -11,11 +11,11 @@ module Grid_Mem
 	reg [DATA_WIDTH-1:0] ram[2**ADDR_WIDTH-1:0];
 	integer i;
 	
-	initial begin
-	for(i = 0; i < 256; i = i+1)	//Just initialize all with zeros
-		ram[i] = 8'b0;
-	// $readmemb("/home/hatasaka/TetrisASIC/grid_mem.txt", ram);
-	end
+	// initial begin
+	// for(i = 0; i < 256; i = i+1)	//Just initialize all with zeros
+	// 	ram[i] = 8'b0;
+	// // $readmemb("/home/hatasaka/TetrisASIC/grid_mem.txt", ram);
+	// end
 
 	// Port A 
 	always @ (posedge clk)

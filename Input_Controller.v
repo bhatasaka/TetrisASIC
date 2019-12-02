@@ -15,27 +15,27 @@ module Input_Controller (
     input reset,
     input button_data_in,
     output reg nes_reset,
-    //output reg [3:0] button_data_out,
+    output reg [3:0] button_data_out
 
-    output latch_tb,
-    output slow_clk_tb,
-    output pulse_tb,
-    output [3:0] button_data_out_tb
+    // output latch_tb,
+    // output slow_clk_tb,
+    // output pulse_tb,
+    // output [3:0] button_data_out_tb
     
 );
     // 50Mhz clock to 60 hertz clock
-    reg [18:0] slow_clk_counter = 19'd0;
-    reg button_lock = 1'b1;
+    reg [18:0] slow_clk_counter;
+    reg button_lock;
 
-    reg slow_clk = 1'b0;
-    reg latch = 1'b0;
-    reg pulse = 1'b0;
-    reg [3:0] button_data_out = 4'b0;
+    reg slow_clk;
+    reg latch;
+    reg pulse;
+    //reg [3:0] button_data_out = 4'b0;
 
-    assign slow_clk_tb = slow_clk;
-    assign latch_tb = latch;
-    assign pulse_tb = pulse;
-    assign button_data_out_tb = button_data_out;
+    // assign slow_clk_tb = slow_clk;
+    // assign latch_tb = latch;
+    // assign pulse_tb = pulse;
+    // assign button_data_out_tb = button_data_out;
     parameter [3:0] A_BUTTON = 4'b0001, B_BUTTON = 4'b0010, SELECT_BUTTON = 4'b0011, START_BUTTON = 4'b0100,
                     UP_BUTTON = 4'b0101, DOWN_BUTTON = 4'b0110, LEFT_BUTTON = 4'b0111, RIGHT_BUTTON = 4'b1000;
     

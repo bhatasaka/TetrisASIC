@@ -20,18 +20,20 @@ reg [3:0] lfsr;
 reg [3:0] box_number;
 reg piece_gen;
 
+wire lf;
+
 integer i;
 
-initial
-begin
-	for (i = 0; i < 12; i = i + 1)
-	begin
-		block[i] = 4'b0;
-	end
-	lfsr = 3'b1;
-	box_number = 4'b0;
-	piece_gen = 1'b0;
-end
+// initial
+// begin
+// 	for (i = 0; i < 12; i = i + 1)
+// 	begin
+// 		block[i] = 4'b0;
+// 	end
+// 	lfsr = 3'b1;
+// 	box_number = 4'b0;
+// 	piece_gen = 1'b0;
+// end
 
 //LFSR Polynomial
 assign lf = (lfsr[3] ^ lfsr[2] ^ lfsr[0]);
