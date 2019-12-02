@@ -19,7 +19,11 @@ module VGA_Controller_tb;
 
     initial 
     begin
+		clk = 1'b0;
+		rst = 1'b0;
 		rgb_8 = 8'b0;
+
+		#FULL_CLK
 
 		rst = 1'b1;
 
@@ -31,7 +35,7 @@ module VGA_Controller_tb;
 		
 		$display("Testing RGB Conversion");
 
-		#1;
+		#FULL_CLK;
 		
 		$display("RED EXPECTED: %d\tACTUAL: %d", 8'b0, r_out);
 		$display("GREEN EXPECTED: %d\tACTUAL: %d", 8'b0, g_out);
@@ -39,7 +43,7 @@ module VGA_Controller_tb;
 
 		rgb_8 = 8'b11111111;
 		
-		#1;
+		#FULL_CLK;
 
 		$display("RED EXPECTED: %d\tACTUAL: %d", 8'b11100000, r_out);
 		$display("GREEN EXPECTED: %d\tACTUAL: %d", 8'b11100000, g_out);
@@ -47,7 +51,7 @@ module VGA_Controller_tb;
 
 		rgb_8 = 8'b10101010;
 
-		#1;
+		#FULL_CLK;
 		
 		$display("RED EXPECTED: %d\tACTUAL: %d", 8'b10100000, r_out);
 		$display("GREEN EXPECTED: %d\tACTUAL: %d", 8'b01000000, g_out);
@@ -55,7 +59,7 @@ module VGA_Controller_tb;
 
 		rgb_8 = 8'b01010101;
 		
-		#1;
+		#FULL_CLK;
 
 		$display("RED EXPECTED: %d\tACTUAL: %d", 8'b01000000, r_out);
 		$display("GREEN EXPECTED: %d\tACTUAL: %d", 8'b10100000, g_out);

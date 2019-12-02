@@ -50,7 +50,7 @@ end
 //be found in once the piece is "placed"
 always @(posedge clk)
 begin
-		if (~en)
+		if (~en || rst)
 		begin
 			reg_1_addr <= 8'b0;
 			reg_2_addr <= 8'b0;

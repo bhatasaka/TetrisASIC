@@ -22,6 +22,9 @@ module VGA_Controller (
 	//For Simulation
 	initial
 	begin
+		h_sync = 1'b0;
+		v_sync = 1'b0;
+		pixel_en = 1'b0;
 		h_screen_on = 1'd0;
 		v_screen_on = 1'd0;
 		h_sync_counter = 14'd0;
@@ -41,12 +44,13 @@ module VGA_Controller (
 	begin
 		if (rst)
 		begin
-			h_screen_on = 1'd0;
-			v_screen_on = 1'd0;
-			h_sync_counter = 14'd0;
-			v_sync_counter = 10'd0;
-			h_sync_mode = 2'd0;
-			v_sync_mode = 2'd0;
+			h_sync <= 1'd0;
+			h_screen_on <= 1'd0;
+			v_screen_on <= 1'd0;
+			h_sync_counter <= 14'd0;
+			v_sync_counter <= 10'd0;
+			h_sync_mode <= 2'd0;
+			v_sync_mode <= 2'd0;
 		end
 		else
 		begin
@@ -130,34 +134,41 @@ module VGA_Controller (
 	//Vertical sync signal
 	always @(posedge clk or v_sync_counter)
 	begin
-		
-		case(v_sync_counter)
-			//Wait Sync
-			10'd2:
-			begin
-				v_sync <= 1'b1;
-			end
-			//Wait Front Porch
-			10'd35:
-			begin
-				v_screen_on <= 1'b1;
-			end
-			//Wait Display Time
-			10'd515:
-			begin
-				v_screen_on <= 1'b0;
-			end
-			//Wait Back Porch
-			10'd525:
-			begin
-				v_sync <= 1'b0;
-			end
-			//maintain signal while lines are counting
-			default:
-			begin
-				v_sync <= v_sync;
-				v_screen_on <= v_screen_on;
-			end
-		endcase
+		if (rst == 1'b1)
+		begin
+			v_sync <= 1'b0;
+			v_screen_on <= 1'b0;
+		end
+		else
+		begin
+			case(v_sync_counter)
+				//Wait Sync
+				10'd2:
+				begin
+					v_sync <= 1'b1;
+				end
+				//Wait Front Porch
+				10'd35:
+				begin
+					v_screen_on <= 1'b1;
+				end
+				//Wait Display Time
+				10'd515:
+				begin
+					v_screen_on <= 1'b0;
+				end
+				//Wait Back Porch
+				10'd525:
+				begin
+					v_sync <= 1'b0;
+				end
+				//maintain signal while lines are counting
+				default:
+				begin
+					v_sync <= v_sync;
+					v_screen_on <= v_screen_on;
+				end
+			endcase
+		end
 	end
 endmodule
