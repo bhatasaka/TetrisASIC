@@ -71,7 +71,7 @@ module Grid_Controller (
 	wire [7:0] line_clear_addr, line_clear_grid_out;
 
 	reg piece_placer_enable, line_clearer_enable, this_we, piece_will_collide;
-	reg has_moved, move_right, move_left;
+	reg has_moved, has_lifted, move_right, move_left;
 	reg [1:0] piece_pos_idx, mem_out_ctl;
 	reg [4:0] state;
 	reg [7:0] this_addr, this_grid_out;
@@ -532,29 +532,51 @@ module Grid_Controller (
 	end
 
 	// Triggers on changing input
-	always @(controller_in, negedge has_moved)
+	always @(controller_in, has_moved)
 	begin
 		if (!has_moved)
 		begin
 			move_right = 1'b0;
 			move_left = 1'b0;
+			has_lifted = 1'b0;
 		end
 		else
 		begin
 			if (controller_in == BTN_RIGHT)
 			begin
-				move_right = 1'b1;
-				move_left = 1'b0;
+				if(has_lifted == 1'b1)
+				begin
+					move_right = 1'b1;
+					move_left = 1'b0;
+					has_lifted = 1'b0;
+				end
+				else
+				begin
+					move_right = 1'b0;
+					move_left = 1'b0;
+					has_lifted = 1'b0;
+				end
 			end
 			else if(controller_in == BTN_LEFT)
 			begin
-				move_right = 1'b0;
-				move_left = 1'b1;
+				if(has_lifted == 1'b1)
+				begin
+					move_right = 1'b0;
+					move_left = 1'b1;
+					has_lifted = 1'b0;
+				end
+				else
+				begin
+					move_right = 1'b0;
+					move_left = 1'b0;
+					has_lifted = 1'b0;
+				end
 			end
 			else
 			begin
 				move_right = 1'b0;
 				move_left = 1'b0;
+				has_lifted = 1'b1;
 			end
 		end
 	end
