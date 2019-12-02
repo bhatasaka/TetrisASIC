@@ -12,10 +12,9 @@ module Tetris (
     wire nes_reset, grid_we, pixel_en;
     wire [3:0] button_data;
     wire [7:0] grid_address_a, grid_address_b, data_from_grid, data_to_grid, 
-               grid_to_converter, vga_to_converter, vga_address, pixel_rgb, vga_b_out;
+               grid_to_converter, vga_to_converter, pixel_rgb, vga_b_out;
+    wire [15:0] vga_address;
 
-
-    
     always @(posedge clk)
     begin
         if (hard_reset|| nes_reset)
