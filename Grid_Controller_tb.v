@@ -51,8 +51,8 @@ module Grid_Controller_tb;
 	    #FULL_CLK;
         reset = 1'b0;
         test_grid_we = 1'b1;
-        test_grid_addr = 8'd65; // Put a block at address 65 to collide when moving down in the grid memory
-        // test_grid_addr = 8'd52; // Put a block at address 52 to collide when moving left in the grid memory
+        // test_grid_addr = 8'd65; // Put a block at address 65 to collide when moving down in the grid memory
+        test_grid_addr = 8'd54; // Put a block at address 52 to collide when moving left in the grid memory
         // test_grid_addr = 8'd255; // Put a block at address 255 to collide with nothing
         test_grid_data = 8'b0000_0001;
 
@@ -64,55 +64,10 @@ module Grid_Controller_tb;
         #FULL_CLK;
         reset = 1'b0;
         #FULL_CLK;
-        // #(130 * FULL_CLK); // Wait 130 clock cycles before input is added so that the piece is in the game area
-        // controller_in = BTN_LEFT;
-        // #(35 *FULL_CLK); // Wait 35 clock cycles to push the button again
-        // controller_in = 4'b0;
-
-        // #(2 *FULL_CLK);
-        // controller_in = BTN_LEFT;
-        // #(35 *FULL_CLK);
-        // controller_in = 4'b0;
-        // #(2 *FULL_CLK);
-        // controller_in = BTN_LEFT;
-        // #(35 *FULL_CLK);
-        // controller_in = 4'b0;
-        // #(2 *FULL_CLK);
-        // controller_in = BTN_LEFT;
-        // #(35 *FULL_CLK);
-        // controller_in = 4'b0;
-        // #(2 *FULL_CLK);
-        // controller_in = BTN_LEFT; 
-        // #(35 *FULL_CLK);
-        // controller_in = 4'b0;
-        // #(2 *FULL_CLK);
-        // controller_in = BTN_LEFT; 
-        // #(35 *FULL_CLK);
-        // controller_in = 4'b0;
-        // #(2 *FULL_CLK);
-        // controller_in = BTN_LEFT;
-        // #(35 *FULL_CLK);
-        // controller_in = 4'b0;
-        // #(2 *FULL_CLK);
-        // controller_in = BTN_LEFT; 
-        // #(35 *FULL_CLK);
-        // controller_in = 4'b0;
-        // #(2 *FULL_CLK);
-        // controller_in = BTN_LEFT; // This one should get denied
-        // #(35 *FULL_CLK);
-        // controller_in = 4'b0;
-        // #(2 *FULL_CLK);
-        // controller_in = BTN_LEFT; // This one should get denied
-        // #(35 *FULL_CLK);
-        // controller_in = 4'b0;
-        // #(2 *FULL_CLK);
-        // controller_in = BTN_LEFT; // This one should get denied
-        // #(35 *FULL_CLK);
-        // controller_in = 4'b0;
-        // #(2 *FULL_CLK);
-        // controller_in = BTN_LEFT; // This one should get denied
-        // #(35 *FULL_CLK);
-        // controller_in = 4'b0;
+        #(260 * FULL_CLK); // Wait 130 clock cycles before input is added so that the piece is in the game area
+        controller_in = BTN_RIGHT;
+        #(100 *FULL_CLK); // Wait 35 clock cycles to push the button again
+        controller_in = 4'b0;
 
         #2000;
 
