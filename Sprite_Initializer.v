@@ -7,9 +7,10 @@ module Sprite_Initializer(
 	output reg we
 );
 
-	reg [12:0] cur_addr;
-	reg [9:0] addr_counter;
+	reg [12:0] addr_counter;
+	reg [9:0] color_counter;
 	reg [7:0] color;
+	reg write;
 
 	parameter [7:0] WHITE       = 8'b11111111,
 	                GREEN       = 8'b00011100,
@@ -30,59 +31,60 @@ module Sprite_Initializer(
 			data <= WHITE;
 			we <= 1'b0;
 
+			write = 1'b0;
 			cur_addr <= 13'b0;
-			addr_counter <= 10'b0;
+			addr_counter <= 13'b0;
+			color_counter <= 10'b0;
 			color <= WHITE;
 		end
 		else
 		begin
-			if (addr_counter == 10'd576)
+			if (color_counter == 10'd576)
 			begin
-
 				case (color)
 					WHITE:
 					begin
-						addr_counter <= 10'd0;
+						color_counter <= 10'd0;
 						color <= GREEN;
 					end
 					GREEN:
 					begin
-						addr_counter <= 10'd0;
+						color_counter <= 10'd0;
 						color <= RED;
 					end
 					RED:
 					begin
-						addr_counter <= 10'd0;
+						color_counter <= 10'd0;
 						color <= BLUE;
 					end
 					BLUE:
 					begin
-						addr_counter <= 10'd0;
+						color_counter <= 10'd0;
 						color <= ORANGE;
 					end
 					ORANGE:
 					begin
-						addr_counter <= 10'd0;
+						color_counter <= 10'd0;
 						color <= YELLOW;
 					end
 					YELLOW:
 					begin
-						addr_counter <= 10'd0;
+						color_counter <= 10'd0;
 						color <= PURPLE;
 					end
 					PURPLE:
 					begin
-						addr_counter <= 10'd0;
+						color_counter <= 10'd0;
 						color <= SKY_BLUE;
 					end
 					SKY_BLUE:
 					begin
-						addr_counter <= 10'd0;
+						color_counter <= 10'd0;
 						color <= BLACK;
 					end
 					BLACK:
 					begin
-						addr_counter <= addr_counter;
+						color_counter <= color_counter;
 						we <= 1'b0;
 						dis <= 1'b0;
 						color <= color;
@@ -93,10 +95,20 @@ module Sprite_Initializer(
 			end
 			else
 			begin
-				we <= 1'b1;
-				addr_counter <= addr_counter + 1'b1;
-				data <= color;
-				addr <= addr_counter + 1'b1;
+				if (write == 1'b0)
+				begin
+					we <= 1'b1;
+					addr_counter <= addr_counter + 1'b1;
+					color_counter <= color_counter + 1'b1;
+					data <= color;
+					write <= 1'b1;
+				end
+				else
+				begin
+					we <= 1'b0;
+					addr <= addr_counter;
+					write <= 1'b0;
+				end
 			end
 		end
 	end
