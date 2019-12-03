@@ -48,7 +48,7 @@ module Grid_To_Video (
     assign grid_addr = 12 * grid_row + grid_col;
 
     // Combinational logic to determine the vga_address
-    always @ (grid_data)
+    always @ (grid_data, row_offset_counter, col_offset_counter)
     begin
         case (grid_data[3:0]) // Mask out the upper bits
             AIR:     vga_addr = row_offset_counter * 24 + col_offset_counter + AIR_ADDR;
@@ -64,7 +64,7 @@ module Grid_To_Video (
         endcase
     end
 
-    always @ (posedge px_clk)
+    always @ (posedge px_clk, posedge reset)
     begin
         if(reset)
         begin

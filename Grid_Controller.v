@@ -60,8 +60,8 @@ module Grid_Controller (
 					PLACE_AREA_START_ADDR = 240,
 					PLACE_AREA_END_ADDR = 251;
 
-	parameter [24:0] SECOND_CLK_INTERVAL = 26'd50000000;
-	// parameter [24:0] SECOND_CLK_INTERVAL = 26'd50; // Testing purposes
+	// parameter [24:0] SECOND_CLK_INTERVAL = 26'd50000000;
+	parameter [24:0] SECOND_CLK_INTERVAL = 26'd50; // Testing purposes
 	parameter[1:0] 	THIS_MEM_OUT 	= 2'd0, 
 					PIECE_MEM_OUT 	= 2'd1,
 					LINE_MEM_OUT 	= 2'd2;

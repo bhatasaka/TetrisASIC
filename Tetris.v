@@ -53,6 +53,7 @@ module Tetris (
         .data_a(data_to_grid),
         .addr_a(grid_address_a), 
         .addr_b(grid_address_b),
+        .reset(mod_rst),
         .we_a(grid_we), 
         .q_a(data_from_grid), 
         .q_b(grid_to_converter)
@@ -69,12 +70,12 @@ module Tetris (
     );
 
     Sprite_Initializer sprite_init (
-    		.clk(clk),
-    		.rst(mod_rst),
-    		.dis(ext_disable),
-    		.addr(mem_init_addr),
-    		.data(mem_init_data),
-    		.we(vga_we)
+        .clk(clk),
+        .rst(reset),
+        .dis(ext_disable),
+        .addr(mem_init_addr),
+        .data(mem_init_data),
+        .we(vga_we)
     );
 
     Grid_To_Video grid_to_video (
@@ -90,6 +91,7 @@ module Tetris (
 
     VGA_Controller vga_controller (
         .clk(clk),
+        .rst(mod_rst),
         .rgb_8(pixel_rgb),
         .r_out(r_out),
         .g_out(g_out),
