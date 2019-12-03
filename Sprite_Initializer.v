@@ -31,7 +31,7 @@ module Sprite_Initializer(
 			data <= WHITE;
 			we <= 1'b0;
 
-			write = 1'b0;
+			write <= 1'b0;
 			addr_counter <= 13'b0;
 			color_counter <= 10'b0;
 			color <= WHITE;
