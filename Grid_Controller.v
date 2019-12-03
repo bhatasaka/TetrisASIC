@@ -3,7 +3,7 @@
 // from the input controller, determines the action that needs to 
 // take place, then updates the tetris grid data.
 // 
-// Author: Jamison Bauer, Sean Eastland, Brian Hatasaka
+// Author: Jamison Bauer, Sean Eastland, Bryan Hatasaka
 // 
 // ============================
 
@@ -34,7 +34,12 @@ module Grid_Controller (
 					s_input_4 	= 5'd15,
 					s_input_5 	= 5'd16,
 					s_clear_0 	= 5'd17,
-					s_clear_1 	= 5'd18;
+					s_clear_1 	= 5'd18,
+					s_move_05 	= 5'd19,
+					s_move_55 	= 5'd20,
+					s_move_22	= 5'd21,
+					s_input_45  = 5'd22,
+					s_input_6	= 5'd23;
 
 	parameter [3:0] BTN_START 	= 4'b0100,
 					BTN_LEFT	= 4'b0111,
@@ -56,7 +61,7 @@ module Grid_Controller (
 					PLACE_AREA_END_ADDR = 251;
 
 	parameter [24:0] SECOND_CLK_INTERVAL = 26'd50000000;
-	// parameter [24:0] SECOND_CLK_INTERVAL = 26'd25; // Testing purposes
+	// parameter [24:0] SECOND_CLK_INTERVAL = 26'd50; // Testing purposes
 	parameter[1:0] 	THIS_MEM_OUT 	= 2'd0, 
 					PIECE_MEM_OUT 	= 2'd1,
 					LINE_MEM_OUT 	= 2'd2;
@@ -71,9 +76,9 @@ module Grid_Controller (
 	wire [7:0] line_clear_addr, line_clear_grid_out;
 
 	reg piece_placer_enable, line_clearer_enable, this_we, piece_will_collide;
-	reg has_moved, has_lifted, move_right, move_left;
+	reg has_moved, has_lifted, move_right, move_left, has_ticked;
 	reg [1:0] piece_pos_idx, mem_out_ctl;
-	reg [4:0] state;
+	reg [4:0] state, next_state;
 	reg [7:0] this_addr, this_grid_out;
 
 	//Array of four 8-bit Registers for tracking poisition
@@ -109,250 +114,305 @@ module Grid_Controller (
 		.data_out(line_clear_grid_out)
 	);
 
-	// every other clk we send address, everyother clk we read data
-	always @(posedge clk)
+
+	always @(state, reset, piece_placed, line_cleared, has_ticked, move_left, move_right, piece_pos_idx, piece_will_collide)
 	begin
 		if (reset)
 		begin
-			state <= s_place_0;
-			tick_interval_counter <= 25'b0;
-			piece_pos_idx <= 2'b0;
-			has_moved <= 1'b1; // Default true
+			next_state = s_place_0;
+			has_moved = 1'b1; // Default true
 		end
 		else
 		begin
-			if (tick_interval_counter == SECOND_CLK_INTERVAL)
-			begin
-				 // If we are just sitting, waiting for input, then we are good to move the block down
-				if(state == s_input_0)
-				begin
-					tick_interval_counter <= 26'b0;
-					state <= s_move_0;
-				end
-				// otherwise, don't increment the counter and we'll eventually move the block down when whatever we're doing finishes
-			end
-			else
-			begin
-				tick_interval_counter <= tick_interval_counter + 1'b1;
-			end
-
 			case(state)
 				s_place_0:
 				begin
 					if(piece_placed == 1'b1)
 					begin
-						state <= s_place_1;
-						piece_pos_idx <= 2'b0;
+						next_state = s_place_1;
 					end
 					else
-						state <= s_place_0;
+						next_state = s_place_0;
+					has_moved = 1'b1;
 				end
 				s_place_1:
 				begin
-					state <= s_input_0;
+					next_state = s_input_0;
+					has_moved = 1'b1;
 				end
 				
 				s_move_0:
 				begin
-					state <= s_move_1;
+					next_state = s_move_05;
+					has_moved = 1'b1;
+				end
+				s_move_05:
+				begin
+					next_state = s_move_1;
+					has_moved = 1'b1;
 				end
 				s_move_1:
 				begin
 					// Go back and forth between states move_0 and move_1 4 times
 					if(piece_pos_idx == 2'd3)
 					begin
-						if(piece_will_collide)
-							state <= s_clear_0;
-						else
-							state <= s_move_2;
-
-						piece_pos_idx <= 2'b0;
+						next_state = s_move_2;
 					end
 					else
 					begin
-						state <= s_move_0;
-						piece_pos_idx <= piece_pos_idx + 2'b1;
+						next_state = s_move_0;
 					end
+					has_moved = 1'b1;
 				end
 				s_move_2: // Active block address
 				begin
-					state <= s_move_3;
+					if(piece_will_collide) // If a previous step detected a collision
+						next_state = s_clear_0;
+					else
+						next_state = s_move_22;
+					has_moved = 1'b1;
+				end
+				s_move_22:
+				begin
+					next_state = s_move_3;
+					has_moved = 1'b1;
 				end
 				s_move_3: // Set active block
 				begin
-					state <= s_move_4;
-					piece_pos_idx <= 2'd0;
+					next_state = s_move_4;
+					has_moved = 1'b1;
 				end
 				s_move_4: // Clear old grid_mem
 				begin
-					state <= s_move_5;
-					piece_pos_idx <= piece_pos_idx + 2'b1;
+					next_state = s_move_5;
+					has_moved = 1'b1;
 				end
 				s_move_5: 
 				begin
 					if(piece_pos_idx == 2'd3)
 					begin
-						state <= s_move_6;
-						piece_pos_idx <= 2'b0;
+						next_state = s_move_55;
 					end
 					else
 					begin
-						state <= s_move_4;
-						piece_pos_idx <= piece_pos_idx + 2'b1;
+						next_state = s_move_4;
 					end
+					has_moved = 1'b1;
+				end
+				s_move_55:
+				begin
+					next_state = s_move_6;
+					has_moved = 1'b1;
 				end
 				s_move_6:// Set new grid_mem with 6 and 7
 				begin
-					state <= s_move_7;
-					piece_pos_idx <= piece_pos_idx + 2'b1;
+					next_state = s_move_7;
+					has_moved = 1'b1;
 				end
 				s_move_7:
 				begin
 					if(piece_pos_idx == 2'd3)
 					begin
-						state <= s_move_8;
-						piece_pos_idx <= 2'b0;
+						next_state = s_move_8;
 					end
 					else
 					begin
-						state <= s_move_6;
-						piece_pos_idx <= piece_pos_idx + 2'b1;
+						next_state = s_move_6;
 					end
+					has_moved = 1'b1;
 				end
 				s_move_8:
 				begin
-					state <= s_input_0; 
-					has_moved <= 1'b1;
+					next_state = s_input_0; 
+					has_moved = 1'b1;
 				end
 
 				s_input_0:
 				begin
-					if ((move_right || move_left) && tick_interval_counter != SECOND_CLK_INTERVAL)
+					if (has_ticked)
 					begin
-						has_moved <= 1'b0;
+						next_state = s_move_0;
+						has_moved = 1'b1;
+					end
+					else if ((move_right || move_left))
+					begin
+						has_moved = 1'b0;
 						
 						if(move_right == 1'b1)
-							state <= s_input_1;
+							next_state = s_input_1;
 						else
-							state <= s_input_2;
+							next_state = s_input_2;
 
-						piece_pos_idx <= 2'd0;
+					end
+					else
+					begin
+						next_state = s_input_0;
+						has_moved = 1'b1;
 					end
 				end
 				s_input_1: // Set next addresses to move right
 				begin
-					state <= s_input_3;
+					next_state = s_input_3;
+					has_moved = 1'b0;
 				end
 				s_input_2: // Set next addresses to move left
 				begin
-					state <= s_input_3;
+					next_state = s_input_3;
+					has_moved = 1'b0;
 				end
 				s_input_3:
 				begin
 					if(piece_will_collide)
 					begin
-						state <= s_input_0;
-						has_moved <= 1'b1;
+						next_state = s_input_0;
+						has_moved = 1'b1;
 					end
 					else
-						state <= s_input_4;
+					begin
+						next_state = s_input_4;
+						has_moved = 1'b0;
+					end
 				end
 				s_input_4: // Go through each new address and set the grid address to it
 				begin
-					state <= s_input_5;
+					next_state = s_input_45;
+					has_moved = 1'b0;
+				end
+				s_input_45:
+				begin
+					next_state = s_input_5;
+					has_moved = 1'b0;
 				end
 				s_input_5: //look at the address and data and determine if a collision will occur
 				begin
 					// Go back and forth between states s_input_4 and s_input_5 4 times
 					if(piece_pos_idx == 2'd3)
 					begin
-						if(piece_will_collide)
-						begin
-							state <= s_input_0; // Just go back to input
-							has_moved <= 1'b1;
-						end
-						else
-							state <= s_move_2; // Move on
-
-						piece_pos_idx <= 2'b0;
+						next_state = s_input_6;
 					end
 					else
 					begin
-						state <= s_input_4;
-						piece_pos_idx <= piece_pos_idx + 2'b1;
+						next_state = s_input_4;
+					end
+					has_moved = 1'b0;
+				end
+				s_input_6:
+				begin
+					if(piece_will_collide)
+					begin
+						next_state = s_input_0; // Just go back to input
+						has_moved = 1'b1;
+					end
+					else
+					begin
+						next_state = s_move_2;
+						has_moved = 1'b0;
 					end
 				end
 				s_clear_0:
 				begin
 					if(line_cleared == 1'b1)
-						state <= s_clear_1;
+						next_state = s_clear_1;
 					else
-						state <= s_clear_0;
+						next_state = s_clear_0;
+					has_moved = 1'b1;
 				end
 				s_clear_1:
 				begin
-					state <= s_place_0;
+					next_state = s_place_0;
+					has_moved = 1'b1;
 				end
 
 				default:
 				begin
-					state <= s_input_0;
+					next_state = s_input_0;
+					has_moved = 1'b1; // Default true
 				end
 			endcase
 		end
 	end
 
-	// OUTPUT Logic always block
-	always @(state, reset)
+	always @ (posedge clk)
 	begin
 		if(reset)
 		begin
-			mem_out_ctl = THIS_MEM_OUT;
-			piece_placer_enable = 1'b0;
-			line_clearer_enable = 1'b0;
-			piece_will_collide = 1'b0;
-			this_addr = 8'b0;
-			active_block_data = 8'b0;
-			this_grid_out = 8'b0;
-			this_we = 1'b0;
-			for (i = 0; i < 12; i = i + 1)
-			begin
-				piece_pos[i] = 4'b0;
-				piece_next_pos[i] = 4'b0;
-			end
+			tick_interval_counter = 25'b0;
+			state <= s_place_0;
 		end
 		else
 		begin
-			this_grid_out = 8'b0;
-			this_we = 1'b0;
-			this_addr = 8'b0;
-			mem_out_ctl = THIS_MEM_OUT;
-			piece_placer_enable = 1'b0;
-			line_clearer_enable = 1'b0;
+			state <= next_state;
+			if(tick_interval_counter == SECOND_CLK_INTERVAL)
+			begin
+				if(next_state == s_move_0)
+				begin
+					has_ticked = 1'b0;
+					tick_interval_counter = 25'b0;
+				end
+				else
+					has_ticked = 1'b1;
+			end
+			else
+			begin
+				tick_interval_counter = tick_interval_counter + 1'b1;
+				has_ticked = 1'b0;
+			end
+		end
+	end
 
+	always @(posedge clk)
+	begin
+		if(reset)
+		begin
+			mem_out_ctl <= THIS_MEM_OUT;
+			piece_placer_enable <= 1'b0;
+			line_clearer_enable <= 1'b0;
+			piece_will_collide <= 1'b0;
+			this_addr <= 8'b0;
+			active_block_data <= 8'b0;
+			this_grid_out <= 8'b0;
+			this_we <= 1'b0;
 			for (i = 0; i < 12; i = i + 1)
 			begin
-				piece_pos[i] = piece_pos[i];
-				piece_next_pos[i] = piece_next_pos[i];
+				piece_pos[i] <= 4'b0;
+				piece_next_pos[i] <= 4'b0;
 			end
-			active_block_data = active_block_data;
-			piece_will_collide = piece_will_collide;
+			piece_pos_idx <= 2'b0;
+
+		end
+		else
+		begin
+			// this_grid_out <= 8'b0;
+			// this_we <= 1'b0;
+			// this_addr <= 8'b0;
+			// piece_placer_enable <= 1'b0;
+			// line_clearer_enable <= 1'b0;
+
+			// for (i = 0; i < 12; i = i + 1)
+			// begin
+			// 	piece_pos[i] <= piece_pos[i];
+			// 	piece_next_pos[i] <= piece_next_pos[i];
+			// end
+			// active_block_data <= active_block_data;
+			// piece_will_collide <= piece_will_collide;
+			// mem_out_ctl <= THIS_MEM_OUT;
 
 			case (state)
 				s_place_0:
 				begin
-					mem_out_ctl = PIECE_MEM_OUT;
-					piece_placer_enable = 1'b1;
-					piece_will_collide = 1'b0;
+					mem_out_ctl <= PIECE_MEM_OUT;
+					piece_placer_enable <= 1'b1;
+					piece_will_collide <= 1'b0;
 				end
 				s_place_1: // Update all the addresses to the new ones
 				begin
-					mem_out_ctl = THIS_MEM_OUT;
-					piece_placer_enable = 1'b0;
-					piece_pos[0] = reg_1_addr;
-					piece_pos[1] = reg_2_addr;
-					piece_pos[2] = reg_3_addr;
-					piece_pos[3] = reg_4_addr;
+					mem_out_ctl <= THIS_MEM_OUT;
+					piece_placer_enable <= 1'b0;
+					piece_pos[0] <= reg_1_addr;
+					piece_pos[1] <= reg_2_addr;
+					piece_pos[2] <= reg_3_addr;
+					piece_pos[3] <= reg_4_addr;
+					piece_pos_idx <= 2'b0;
 				end
 
 				s_move_0: // Find the next address that we need to read from
@@ -360,26 +420,38 @@ module Grid_Controller (
 					if(piece_pos[piece_pos_idx] >= PLACE_AREA_START_ADDR) // Check if the block is in the starting area
 					begin
 						if(piece_pos[piece_pos_idx] == 8'd249)
-							this_addr = 8'd5;
+						begin
+							this_addr <= 8'd5;
+							piece_next_pos[piece_pos_idx] <= 8'd5;
+						end
 						else if(piece_pos[piece_pos_idx] == 8'd250)
-							this_addr = 8'd6;
+						begin
+							piece_next_pos[piece_pos_idx] <= 8'd6;
+							this_addr <= 8'd6;
+						end
 						else if(piece_pos[piece_pos_idx] == 8'd251)
-							this_addr = 8'd7;
+						begin
+							piece_next_pos[piece_pos_idx] <= 8'd7;
+							this_addr <= 8'd7;
+						end
 						else // If it's in the starting area, but not on the bottom row
 						begin
-							this_addr = piece_pos[piece_pos_idx] + 3;
+							piece_next_pos[piece_pos_idx] <= piece_pos[piece_pos_idx] + 3;
+							this_addr <= piece_pos[piece_pos_idx] + 3;
 						end
 
 					end
 					else
 					begin
-						this_addr = piece_pos[piece_pos_idx] + 12;
+						piece_next_pos[piece_pos_idx] <= piece_pos[piece_pos_idx] + 12;
+						this_addr <= piece_pos[piece_pos_idx] + 12;
 					end
-					// Blocking assignments so we can do this I think
-					piece_next_pos[piece_pos_idx] = this_addr;
 				end
 
-				s_move_1: // Read the next block position to see if it's available
+				s_move_05: // Read the next block position to see if it's available
+				begin
+				end
+				s_move_1:
 				begin
 					// We are now reading the addresses directly below each block
 					// And we need to check if we are able to move this block down
@@ -402,7 +474,7 @@ module Grid_Controller (
 					begin
 						if(piece_next_pos[piece_pos_idx] > GRID_END_ADDR)
 						begin
-							piece_will_collide = 1'b1;
+							piece_will_collide <= 1'b1;
 						end
 						// Checking for overlap, it's fine if the new address is an old address
 						else if( piece_next_pos[piece_pos_idx] != piece_pos[0] &&
@@ -411,58 +483,82 @@ module Grid_Controller (
 						    piece_next_pos[piece_pos_idx] != piece_pos[3] )
 						begin
 							if(tetris_grid_in[3:0] != BLOCK_AIR)
-								piece_will_collide = 1'b1;
-							else
-								piece_will_collide = piece_will_collide;
+								piece_will_collide <= 1'b1;
 						end
 					end
+					piece_pos_idx <= piece_pos_idx + 2'b1;
 				end
 
 				s_move_2: // Set the address to get the block data of the active block
 				begin
-					this_addr = piece_pos[0];
-					piece_will_collide = 1'b0; // Can reset this here
+					this_addr <= piece_pos[0];
+					piece_will_collide <= 1'b0; // Can reset this here
+				end
+
+				s_move_22:
+				begin
+					piece_pos_idx <= 2'b0;
 				end
 
 				s_move_3: // Get the active block data
 				begin
-					active_block_data = tetris_grid_in;
+					active_block_data <= tetris_grid_in;
 				end
-				s_move_4, s_move_5:
+				s_move_4:
+				begin
+					this_we <= 1'b1;
+					this_grid_out <= 8'b0;
+					this_addr <= piece_pos[piece_pos_idx];
+				end
+				s_move_5:
 				begin // Set the data of the old block positions to air
-					this_we = 1'b1;
-					this_grid_out = 8'b0;
-					this_addr = piece_pos[piece_pos_idx];
+					this_we <= 1'b1;
+					this_grid_out <= 8'b0;
+					this_addr <= piece_pos[piece_pos_idx];
+					piece_pos_idx <= piece_pos_idx + 2'b1;
 				end
-				s_move_6, s_move_7:
+				s_move_55:
+				begin
+					piece_pos_idx <= 2'b0;
+				end
+				s_move_6:
+				begin
+					this_we <= 1'b1;
+					this_grid_out <= active_block_data;
+					this_addr <= piece_next_pos[piece_pos_idx];
+					piece_pos[piece_pos_idx] <= piece_next_pos[piece_pos_idx];
+				end
+				s_move_7:
 				begin // Set the data of the next block to the active block and update the current address
-					this_we = 1'b1;
-					this_grid_out = active_block_data;
-					this_addr = piece_next_pos[piece_pos_idx];
-					piece_pos[piece_pos_idx] = piece_next_pos[piece_pos_idx];
+					this_we <= 1'b1;
+					this_grid_out <= active_block_data;
+					this_addr <= piece_next_pos[piece_pos_idx];
+					piece_pos[piece_pos_idx] <= piece_next_pos[piece_pos_idx];
+					piece_pos_idx <= piece_pos_idx + 2'b1;
 				end
 				s_move_8:
 				begin // After clear write enable
-					this_we = 1'b0;
+					this_we <= 1'b0;
 				end
 
 				s_input_0:
 				begin
-					piece_will_collide = 1'b0;
+					piece_will_collide <= 1'b0;
+					piece_pos_idx <= 2'b0;
 				end
 				s_input_1: // Move right, get next addresses, don't worry about overflow, or edges yet
 				begin
-					piece_next_pos[0] = piece_pos[0] + 1;
-					piece_next_pos[1] = piece_pos[1] + 1;
-					piece_next_pos[2] = piece_pos[2] + 1;
-					piece_next_pos[3] = piece_pos[3] + 1;
+					piece_next_pos[0] <= piece_pos[0] + 1;
+					piece_next_pos[1] <= piece_pos[1] + 1;
+					piece_next_pos[2] <= piece_pos[2] + 1;
+					piece_next_pos[3] <= piece_pos[3] + 1;
 				end
 				s_input_2: // Move right, get next addresses, don't worry about overflow, or edges yet
 				begin
-					piece_next_pos[0] = piece_pos[0] - 8'd1;
-					piece_next_pos[1] = piece_pos[1] - 8'd1;
-					piece_next_pos[2] = piece_pos[2] - 8'd1;
-					piece_next_pos[3] = piece_pos[3] - 8'd1;
+					piece_next_pos[0] <= piece_pos[0] - 8'd1;
+					piece_next_pos[1] <= piece_pos[1] - 8'd1;
+					piece_next_pos[2] <= piece_pos[2] - 8'd1;
+					piece_next_pos[3] <= piece_pos[3] - 8'd1;
 				end
 				s_input_3:
 				begin
@@ -474,20 +570,25 @@ module Grid_Controller (
 						|| piece_next_pos[2] == i[7:0] || piece_next_pos[2] == i[7:0]+11
 						|| piece_next_pos[3] == i[7:0] || piece_next_pos[3] == i[7:0]+11)
 						begin
-							piece_will_collide = 1'b1;
+							piece_will_collide <= 1'b1;
 						end
 					end
+					piece_pos_idx <= 2'b0;
+					this_addr <= piece_next_pos[piece_pos_idx];
 				end
 				s_input_4:
 				begin
-					this_addr = piece_next_pos[piece_pos_idx];
+					this_addr <= piece_next_pos[piece_pos_idx];
+				end
+				s_input_45:
+				begin
 				end
 				s_input_5:
 				begin
 					// If the piece is in the starting area, we're not going to move it
 					if(piece_pos[piece_pos_idx] >= PLACE_AREA_START_ADDR)
 					begin
-						piece_will_collide = 1'b1;
+						piece_will_collide <= 1'b1;
 					end
 					else // At this point, we should have valid addresses
 					begin
@@ -498,20 +599,24 @@ module Grid_Controller (
 						    piece_next_pos[piece_pos_idx] != piece_pos[3] )
 						begin
 							if(tetris_grid_in[3:0] != BLOCK_AIR)
-								piece_will_collide = 1'b1;
+								piece_will_collide <= 1'b1;
 						end
 					end
+					piece_pos_idx <= piece_pos_idx + 2'b1;
 				end
-
+				s_input_6:
+				begin
+					piece_pos_idx <= 2'b0;
+				end
 				s_clear_0:
 				begin
-					mem_out_ctl = LINE_MEM_OUT;
-					line_clearer_enable = 1'b1;
+					mem_out_ctl <= LINE_MEM_OUT;
+					line_clearer_enable <= 1'b1;
 				end
 				s_clear_1:
 				begin
-					mem_out_ctl = THIS_MEM_OUT;
-					line_clearer_enable = 1'b0;
+					mem_out_ctl <= THIS_MEM_OUT;
+					line_clearer_enable <= 1'b0;
 				end
 
 				default:
