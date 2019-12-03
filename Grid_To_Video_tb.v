@@ -6,7 +6,6 @@ module Grid_To_Video_tb;
 	reg[15:0] vga_addr_b;
 	wire [7:0] vga_out_a, grid_out_a, grid_addr_b, pixel_rgb;
 	wire [7:0] vga_out_b, grid_out_b;
-    wire [15:0] vga_addr_a;
 	// reg [7:0] data_a;
 	// reg [15:0] addr_a;
 
@@ -14,16 +13,6 @@ module Grid_To_Video_tb;
 	parameter HALF_CLK = 10;
 	
 	integer i = 0;
-
-	VGA_Mem vga_mem_test (
-		.data_a(8'b0),
-		.addr_a(vga_addr_a),
-		.addr_b(vga_addr_b),
-		.we_a(1'b0),
-		.clk(clock),
-		.q_a(vga_out_a),
-		.q_b(vga_out_b)
-	);
 	
     Grid_Mem grid_mem_test (
         .data_a(grid_data_in),
@@ -40,11 +29,9 @@ module Grid_To_Video_tb;
         .clk(clock),
         .px_en(px_en),
         .reset(reset),
-        .vga_data(vga_out_a),
         .grid_data(grid_out_b),
         .pixel_rgb(pixel_rgb),
-        .grid_addr(grid_addr_b),
-        .vga_addr(vga_addr_a)
+        .grid_addr(grid_addr_b)
     );
 
 

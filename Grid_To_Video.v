@@ -11,10 +11,8 @@ module Grid_To_Video (
     input px_en,
     input reset,
 	input [7:0] grid_data,
-	input [7:0] vga_data,
     output [7:0] grid_addr,
-    output reg [7:0] pixel_rgb,
-    output reg [12:0] vga_addr
+    output reg [7:0] pixel_rgb
 );
 
     reg px_clk;
@@ -44,23 +42,32 @@ module Grid_To_Video (
     parameter L_PIECE_ADDR =      13'd4032;
     parameter BORDER_ADDR = 13'd4608;
 
+	parameter [7:0] WHITE       = 8'b11111111,
+	                GREEN       = 8'b00011100,
+	                RED         = 8'b11100000,
+	                BLUE        = 8'b00000011,
+	                ORANGE      = 8'b11101100,
+	                YELLOW      = 8'b11111100,
+	                PURPLE      = 8'b11100011,
+	                SKY_BLUE    = 8'b00011111,
+	                BLACK       = 8'b00000000;
 
     assign grid_addr = 12 * grid_row + grid_col;
 
     // Combinational logic to determine the vga_address
-    always @ (grid_data, row_offset_counter, col_offset_counter)
+    always @ (grid_data)
     begin
         case (grid_data[3:0]) // Mask out the upper bits
-            AIR:     vga_addr = row_offset_counter * 24 + col_offset_counter + AIR_ADDR;
-            I_PIECE: vga_addr = row_offset_counter * 24 + col_offset_counter + I_PIECE_ADDR;
-            O_PIECE: vga_addr = row_offset_counter * 24 + col_offset_counter + O_PIECE_ADDR;
-            T_PIECE: vga_addr = row_offset_counter * 24 + col_offset_counter + T_PIECE_ADDR;
-            S_PIECE: vga_addr = row_offset_counter * 24 + col_offset_counter + S_PIECE_ADDR;
-            Z_PIECE: vga_addr = row_offset_counter * 24 + col_offset_counter + Z_PIECE_ADDR;
-            J_PIECE: vga_addr = row_offset_counter * 24 + col_offset_counter + J_PIECE_ADDR;
-            L_PIECE: vga_addr = row_offset_counter * 24 + col_offset_counter + L_PIECE_ADDR;
-            BORDER:  vga_addr = row_offset_counter * 24 + col_offset_counter + BORDER_ADDR;
-            default: vga_addr = 16'b0;
+            AIR:     pixel_rgb = WHITE;
+            I_PIECE: pixel_rgb = GREEN;
+            O_PIECE: pixel_rgb = RED;
+            T_PIECE: pixel_rgb = BLUE;
+            S_PIECE: pixel_rgb = ORANGE;
+            Z_PIECE: pixel_rgb = YELLOW;
+            J_PIECE: pixel_rgb = PURPLE;
+            L_PIECE: pixel_rgb = SKY_BLUE;
+            BORDER:  pixel_rgb = BLACK;
+            default: pixel_rgb = 16'b0;
         endcase
     end
 
@@ -71,11 +78,9 @@ module Grid_To_Video (
             col_offset_counter <= 5'b0;
             current_column <= 10'b0;
             grid_col <= 5'b0;
-            pixel_rgb <= 8'b0;
         end
         else if(px_en)
         begin
-            pixel_rgb <= vga_data;
             // Testing that we are inside the actual tetris area
             if(current_column >= 176 && current_column <= 463)
             begin
@@ -111,7 +116,6 @@ module Grid_To_Video (
         else if(px_en == 1'b0)
         begin
             // If px_en isn't high, then we will just reset the current column to 0
-            pixel_rgb <= 8'b0;
             current_column <= 10'b0;
             grid_col <= 5'b0;
             col_offset_counter <= 5'b0;
