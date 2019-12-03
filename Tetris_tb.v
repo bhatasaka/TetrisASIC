@@ -49,4 +49,4 @@ module Tetris_tb;
   	clk <= ~clk;
 	end
 
-endmodule;
+endmodule
