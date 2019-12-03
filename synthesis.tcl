@@ -14,6 +14,7 @@ set GATE_DIR 	 "${BASE_DIR}/verilog/gate"
 set SDF_DIR 	 "${BASE_DIR}/SDF"
 set SDC_DIR 	 "${BASE_DIR}/SDC"
 set DDC_DIR 	 "${BASE_DIR}/DDC"
+set DESIGN_LIB	"${BASE_DIR}/DESIGN_LIBS/$design"
 
 #  dependency rules
 set HDL_FILES [list \
@@ -72,7 +73,7 @@ check_design
 
 #  Map and optimize the design
 puts "-i- Map and optimize design"
-compile
+compile_ultra
 
 #  Save the mapped design
 puts "-i- Save mapped design"

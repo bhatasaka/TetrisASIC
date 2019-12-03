@@ -1,5 +1,7 @@
 `include "/research/ece/lnis-teaching/5710_6710/Lab_files/HDL/padlib_tsmc180_innovus.v"
 
+`include "/home/jamisonb/ECE5710_F19/verilog/Project/TetrisASIC/Tetris_mapped.v"
+
 module Tetris_Top (
     input clk,
     input hard_reset,
@@ -65,7 +67,7 @@ module Tetris_Top (
     pad_corner corner3 ();
 
     // post synthesis verilog file
-    Tetris_Mapped tetris_mapped (
+    Tetris tetris_mapped (
         .clk(clk_pad),
         .hard_reset(hard_reset_pad),
         .nes_in(nes_in_pad),
